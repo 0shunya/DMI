@@ -32,7 +32,6 @@ function App() {
         <CityJobsChart data={cityJobs} />
         <CitySkillChart data={citySkillDemand} />
         <CountrySkillChart data={countrySkillDemand} />
-        <CountrySkillChart data={countrySkillDemand} />
       </main>
     </>
   );
