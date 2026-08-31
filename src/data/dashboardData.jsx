@@ -48,31 +48,36 @@ export const skillDemand = [
 ];
 
 // Salary Demand
-
 export const skillSalary = [
   {
     skill: "Python",
     salary: 12.4,
+    demand: 92,
   },
   {
     skill: "Java",
     salary: 13.1,
+    demand: 88,
   },
   {
     skill: "JavaScript",
     salary: 11.8,
+    demand: 90,
   },
   {
     skill: "TypeScript",
     salary: 12.6,
+    demand: 78,
   },
   {
     skill: "C#",
     salary: 10.9,
+    demand: 74,
   },
   {
     skill: "Go",
     salary: 15.2,
+    demand: 61,
   },
 ];
 

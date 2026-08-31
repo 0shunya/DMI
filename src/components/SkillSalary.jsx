@@ -1,5 +1,5 @@
 import {
-  BarChart,
+  ComposedChart,
   Bar,
   XAxis,
   YAxis,
@@ -15,17 +15,34 @@ function SkillSalaryChart({ data }) {
 
       <div className="chart-container">
         <ResponsiveContainer width="100%" height={350}>
-          <BarChart data={data}>
+          <ComposedChart  data={data}>
             <CartesianGrid strokeDasharray="5 2" />
 
             <XAxis dataKey="skill" />
 
-            <YAxis />
+            <YAxis 
+              yAxisId="salary" 
+              label={{
+                value: "Salary (₹ LPA)",
+                angle: -90,
+                position: "insideLeft",
+              }} />
+              
+             <YAxis
+              yAxisId="demand"
+              orientation="right"
+              label={{
+                value: "Demand Score",
+                angle: 90,
+                position: "insideRight",
+              }}
+            />
 
             <Tooltip />
 
-            <Bar dataKey="salary" />
-          </BarChart>
+            <Bar dataKey="salary" yAxisId="salary" />
+            <Bar dataKey="demand" yAxisId="demand" />
+          </ComposedChart >
         </ResponsiveContainer>
       </div>
     </div>
