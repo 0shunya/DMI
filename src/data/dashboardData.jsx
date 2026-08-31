@@ -137,3 +137,36 @@ export const citySkillDemand = [
     CSharp: 58,
   },
 ];
+
+//Country wise Data
+
+export const countrySkillDemand = [
+  {
+    country: "India",
+    Python: 85,
+    Java: 82,
+    JavaScript: 78,
+    CSharp: 64,
+  },
+  {
+    country: "USA",
+    Python: 91,
+    Java: 74,
+    JavaScript: 88,
+    CSharp: 61,
+  },
+  {
+    country: "Germany",
+    Python: 76,
+    Java: 87,
+    JavaScript: 69,
+    CSharp: 72,
+  },
+  {
+    country: "Canada",
+    Python: 84,
+    Java: 71,
+    JavaScript: 81,
+    CSharp: 59,
+  },
+];

@@ -1,10 +1,11 @@
 import Navbar from "./components/Navbar";
 import StatCard from "./components/StatCard";
-import { stats, skillDemand, skillSalary, cityJobs, citySkillDemand } from "./data/dashboardData.js+";
+import { stats, skillDemand, skillSalary, cityJobs, citySkillDemand, countrySkillDemand } from "./data/dashboardData.jsx";
 import SkillDemandChart from "./components/SkillDemandChart";
-import SkillSalaryChart from "./components/skillSalary";
+import SkillSalaryChart from "./components/SkillSalary";
 import CityJobsChart from "./components/CityJobsChart";
 import CitySkillChart from "./components/CitySkillChart";
+import CountrySkillChart from "./components/CountrySkillChart";
 
 function App() {
   return (
@@ -30,6 +31,8 @@ function App() {
         <SkillSalaryChart data={skillSalary} />
         <CityJobsChart data={cityJobs} />
         <CitySkillChart data={citySkillDemand} />
+        <CountrySkillChart data={countrySkillDemand} />
+        <CountrySkillChart data={countrySkillDemand} />
       </main>
     </>
   );
