@@ -9,19 +9,34 @@ import {
 } from "recharts";
 
 function SkillSalaryChart({ data }) {
+const highestSalary = data.reduce((highest, current) =>
+  current.salary > highest ? current.salary : highest,
+  0
+);
+
+  console.log("Highest Salary:", highestSalary);
+
+  const chartData = data.map((item) => ({
+  skill: item.skill,
+  salaryScore: (item.salary / highestSalary) * 100,
+  demand: item.demand,
+}));
+
+  console.log("Chart Data:", chartData);
+
   return (
     <div className="chart-card">
       <h2>Average Salary by Skill</h2>
 
       <div className="chart-container">
         <ResponsiveContainer width="100%" height={350}>
-          <ComposedChart  data={data}>
+         <ComposedChart data={chartData} barGap={10}>
             <CartesianGrid strokeDasharray="5 2" />
 
             <XAxis dataKey="skill" />
-
             <YAxis 
               yAxisId="salary" 
+              orientation="left"
               label={{
                 value: "Salary (₹ LPA)",
                 angle: -90,
@@ -40,8 +55,8 @@ function SkillSalaryChart({ data }) {
 
             <Tooltip />
 
-            <Bar dataKey="salary" yAxisId="salary" />
-            <Bar dataKey="demand" yAxisId="demand" />
+<Bar dataKey="salaryScore" yAxisId="salary" barSize={30} />
+<Bar dataKey="demand" yAxisId="demand" barSize={30} />
           </ComposedChart >
         </ResponsiveContainer>
       </div>
