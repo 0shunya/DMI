@@ -27,57 +27,46 @@ function CustomTooltip({ active, payload, label }) {
 }
 
 function SkillSalaryChart({ data }) {
-const highestSalary = data.reduce((highest, current) =>
-  current.salary > highest ? current.salary : highest,
-  0
-);
 
-const highestSalarySkill = data.find(
-  (item) => item.salary === highestSalary
-);
+  const highestSalary = Math.max(
+    ...data.map((item) => item.salary)
+  );
 
-  console.log("Highest Salary:", highestSalary);
-
-  console.log("Highest Salary Skill:", highestSalarySkill);
-
-const chartData = data.map((item) => ({
-  skill: item.skill,
-  salary: item.salary,
-  salaryScore: (item.salary / highestSalary) * 100,
-  demand: item.demand,
-  opportunityScore:
-    ((item.salary / highestSalary) * 100 * 0.5) +
-    (item.demand * 0.5),
-}));
-
-const bestOpportunity = chartData.reduce(
-  (best, current) =>
-    current.opportunityScore > best.opportunityScore
-      ? current
-      : best
-);
-
-console.log("Best Opportunity:", bestOpportunity);
-
-  console.log("Chart Data:", chartData);
-
-  console.log("Opportunity Scores:", chartData.map((item) => ({
+  const chartData = data.map((item) => ({
     skill: item.skill,
-    score: item.opportunityScore,
-  })));
+    salary: item.salary,
+    salaryScore: (item.salary / highestSalary) * 100,
+    demand: item.demand,
+  }));
+
+// const bestOpportunity = chartData.reduce(
+//   (best, current) =>
+//     current.opportunityScore > best.opportunityScore
+//       ? current
+//       : best
+// );
+
+// console.log("Best Opportunity:", bestOpportunity);
+
+  // console.log("Chart Data:", chartData);
+
+  // console.log("Opportunity Scores:", chartData.map((item) => ({
+  //   skill: item.skill,
+  //   score: item.opportunityScore,
+  // })));
 
   return (
     <div className="chart-card">
       <h2>Average Salary by Skill</h2>
 
-    <div className="best-opportunity">
+    {/* <div className="best-opportunity">
       <strong>Best Opportunity:</strong>{" "}
       {bestOpportunity.skill} ({bestOpportunity.opportunityScore.toFixed(1)})
 
       <p>
         Salary: ₹{bestOpportunity.salary} LPA | Demand: {bestOpportunity.demand}
       </p>
-    </div>
+    </div> */}
 
       <div className="chart-container">
         <ResponsiveContainer width="100%" height={350}>

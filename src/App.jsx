@@ -7,6 +7,10 @@ import CityJobsChart from "./components/CityJobsChart";
 import CitySkillChart from "./components/CitySkillChart";
 import CountrySkillChart from "./components/CountrySkillChart";
 import Handwriting from "./components/Handwriting";
+import {
+  findBestOpportunity,
+  rankSkills,
+} from "./utils/opportunityScore";
 
 function App() {
   const highestSalary = skillSalary.reduce(
@@ -15,11 +19,14 @@ function App() {
     0
   );
 
-  console.log("App Highest Salary:", highestSalary);
+  // console.log("App Highest Salary:", highestSalary);
 
   const highestSalarySkill = skillSalary.find(
   (item) => item.salary === highestSalary
 );
+
+ const bestOpportunity = findBestOpportunity(skillSalary);
+ const rankedSkills = rankSkills(skillSalary);
   return (
     <>
       <Navbar />
@@ -40,16 +47,21 @@ function App() {
 
         </section>
 
-        <section className="insight-card">
-          <Handwriting fontSize="32px">
-            Market Insight
-          </Handwriting>
+<section className="top-skills">
+  <h2>Top Skills</h2>
 
-          <p>
-            Go currently offers the highest average salary,
-            while Java and Python show strong market demand.
-          </p>
-        </section>
+  {rankedSkills.slice(0, 3).map((skill, index) => (
+    <div className="top-skill" key={skill.skill}>
+      <span>#{index + 1} </span>
+
+      <strong>{skill.skill}</strong>
+
+      <span>
+        {skill.opportunityScore.toFixed(1)}
+      </span>
+    </div>
+  ))}
+</section>
 
         <SkillDemandChart data={skillDemand} />
         <SkillSalaryChart data={skillSalary} />
