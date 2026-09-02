@@ -4,9 +4,11 @@ import "../styles/skills.css"
 
 import Navbar from "../components/Navbar";
 import Handwriting from "../components/Handwriting";
+import SkillAnalysisChart from "../components/SkillAnalysisChart";
 
 import { skillSalary } from "../data/dashboardData.jsx";
 import { rankSkills } from "../utils/opportunityScore";
+
 
 function Skills() {
   const [selectedSkill, setSelectedSkill] = useState("Python");
@@ -92,6 +94,11 @@ const skillDataWithScore = rankedSkills.find(
             salary of <strong>₹{skillData.salary} LPA</strong>.
           </p>
         </section>
+
+       <SkillAnalysisChart
+  skill={skillData}
+  maxSalary={Math.max(...skillSalary.map((item) => item.salary))}
+/>
       </main>
     </>
   );
