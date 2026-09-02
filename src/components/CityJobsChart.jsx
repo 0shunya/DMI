@@ -8,6 +8,19 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
+function CustomTooltip({ active, payload, label }) {
+  if (!active || !payload || !payload.length) {
+    return null;
+  }
+
+  return (
+    <div className="custom-tooltip">
+      <p><strong>{label}</strong></p>
+      <p>Developer Jobs: {payload[0].value}</p>
+    </div>
+  );
+}
+
 function CityJobsChart({ data }) {
   return (
     <div className="chart-card">
@@ -20,11 +33,21 @@ function CityJobsChart({ data }) {
 
             <XAxis dataKey="city" />
 
-            <YAxis />
+            <YAxis
+              label={{
+                value: "Number of Jobs",
+                angle: -90,
+                position: "insideLeft",
+              }}
+            />
 
-            <Tooltip />
+            <Tooltip content={<CustomTooltip />} />
 
-            <Bar dataKey="jobs" />
+            <Bar
+              dataKey="jobs"
+              barSize={40}
+              fill="#4F46E5"
+            />
           </BarChart>
         </ResponsiveContainer>
       </div>

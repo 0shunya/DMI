@@ -8,6 +8,19 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
+function CustomTooltip({ active, payload, label }) {
+  if (!active || !payload || !payload.length) {
+    return null;
+  }
+
+  return (
+    <div className="custom-tooltip">
+      <p><strong>{label}</strong></p>
+      <p>Demand Score: {payload[0].value}</p>
+    </div>
+  );
+}
+
 function SkillDemandChart({ data }) {
   return (
     <div className="chart-card">
@@ -20,11 +33,21 @@ function SkillDemandChart({ data }) {
 
             <XAxis dataKey="skill" />
 
-            <YAxis />
+            <YAxis
+              label={{
+                value: "Demand Score",
+                angle: -90,
+                position: "insideLeft",
+              }}
+            />
 
-            <Tooltip />
+            <Tooltip content={<CustomTooltip />} />
 
-            <Bar dataKey="demand" />
+            <Bar
+              dataKey="demand"
+              barSize={40}
+              fill="#4F46E5"
+            />
           </BarChart>
         </ResponsiveContainer>
       </div>

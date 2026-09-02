@@ -1,4 +1,4 @@
-import {useState } from "react";
+import { useState } from "react";
 
 import {
   BarChart,
@@ -7,62 +7,68 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend,
   ResponsiveContainer,
 } from "recharts";
 
-function CountrySkillChart({ data }) {
-    const [selectedCountry, setSelectedCountry] = useState("India");
-    const countryData = data.find(
-        (item) => item.country === selectedCountry
-    );
-    const chartData = [
-  {
-    skill: "Python",
-    demand: countryData.Python,
-  },
-  {
-    skill: "Java",
-    demand: countryData.Java,
-  },
-  {
-    skill: "JavaScript",
-    demand: countryData.JavaScript,
-  },
-  {
-    skill: "C#",
-    demand: countryData.CSharp,
-  },
-];
+function CustomTooltip({ active, payload, label }) {
+  if (!active || !payload || !payload.length) {
+    return null;
+  }
 
-const topSkill = chartData.reduce((highest, current) => current.demand > highest.demand ? current:highest );
+  return (
+    <div className="custom-tooltip">
+      <p><strong>{label}</strong></p>
+      <p>Demand Score: {payload[0].value}</p>
+    </div>
+  );
+}
+
+function CountrySkillChart({ data }) {
+  const [selectedCountry, setSelectedCountry] = useState("India");
+
+  const countryData = data.find(
+    (item) => item.country === selectedCountry
+  );
+
+  const chartData = [
+    { skill: "Python", demand: countryData.Python },
+    { skill: "Java", demand: countryData.Java },
+    { skill: "JavaScript", demand: countryData.JavaScript },
+    { skill: "C#", demand: countryData.CSharp },
+  ];
+
+  const topSkill = chartData.reduce(
+    (highest, current) =>
+      current.demand > highest.demand ? current : highest
+  );
 
   return (
     <div className="chart-card">
       <h2>Skills by Country</h2>
 
-      <div className="top-skill">
-      <strong>Most Needed Skill:</strong>{" "}
-      {topSkill.skill} ({topSkill.demand})
-    </div>
-
       <div className="country-selector">
-        <label htmlFor="country" >Select Country</label>
-     
+        <label htmlFor="country">Select Country: </label>
 
-      <select 
-      id="country"
-      value={selectedCountry}
-      onChange={(event) => setSelectedCountry(event.target.value)}
-      >
-        {data.map((item) => (
-          <option key={item.country} value={item.country}>
-            {item.country}
-          </option>
-        ))}
+        <select
+          id="country"
+          value={selectedCountry}
+          onChange={(event) =>
+            setSelectedCountry(event.target.value)
+          }
+        >
+          {data.map((item) => (
+            <option key={item.country} value={item.country}>
+              {item.country}
+            </option>
+          ))}
+        </select>
+      </div>
 
-      </select>
-   </div>
+      <p className="top-skill-country">
+        Most Needed Skill:{" "}
+        <strong>{topSkill.skill}</strong>{" "}
+        ({topSkill.demand})
+      </p>
 
       <div className="chart-container">
         <ResponsiveContainer width="100%" height={400}>
@@ -71,13 +77,21 @@ const topSkill = chartData.reduce((highest, current) => current.demand > highest
 
             <XAxis dataKey="skill" />
 
-            <YAxis />
+            <YAxis
+              label={{
+                value: "Demand Score",
+                angle: -90,
+                position: "insideLeft",
+              }}
+            />
 
-            <Tooltip />
+            <Tooltip content={<CustomTooltip />} />
 
-            <Legend />
-
-            <Bar dataKey="demand" fill="#FFA500" />
+            <Bar
+              dataKey="demand"
+              barSize={40}
+              fill="#FFA500"
+            />
           </BarChart>
         </ResponsiveContainer>
       </div>

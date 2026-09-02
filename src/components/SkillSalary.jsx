@@ -9,7 +9,6 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-
 function CustomTooltip({ active, payload, label }) {
   if (!active || !payload || !payload.length) {
     return null;
@@ -28,64 +27,39 @@ function CustomTooltip({ active, payload, label }) {
 
 function SkillSalaryChart({ data }) {
 
-  const highestSalary = Math.max(
-    ...data.map((item) => item.salary)
-  );
-
   const chartData = data.map((item) => ({
     skill: item.skill,
     salary: item.salary,
-    salaryScore: (item.salary / highestSalary) * 100,
     demand: item.demand,
   }));
-
-// const bestOpportunity = chartData.reduce(
-//   (best, current) =>
-//     current.opportunityScore > best.opportunityScore
-//       ? current
-//       : best
-// );
-
-// console.log("Best Opportunity:", bestOpportunity);
-
-  // console.log("Chart Data:", chartData);
-
-  // console.log("Opportunity Scores:", chartData.map((item) => ({
-  //   skill: item.skill,
-  //   score: item.opportunityScore,
-  // })));
 
   return (
     <div className="chart-card">
       <h2>Average Salary by Skill</h2>
 
-    {/* <div className="best-opportunity">
-      <strong>Best Opportunity:</strong>{" "}
-      {bestOpportunity.skill} ({bestOpportunity.opportunityScore.toFixed(1)})
-
-      <p>
-        Salary: ₹{bestOpportunity.salary} LPA | Demand: {bestOpportunity.demand}
-      </p>
-    </div> */}
-
       <div className="chart-container">
         <ResponsiveContainer width="100%" height={350}>
-         <ComposedChart data={chartData} barGap={10}>
+          <ComposedChart data={chartData} barGap={10}>
+
             <CartesianGrid strokeDasharray="5 2" />
 
             <XAxis dataKey="skill" />
-            <YAxis 
-              yAxisId="salary" 
+
+            <YAxis
+              yAxisId="salary"
               orientation="left"
+              domain={[0, "dataMax + 2"]}
               label={{
                 value: "Salary (₹ LPA)",
                 angle: -90,
                 position: "insideLeft",
-              }} />
-              
-             <YAxis
+              }}
+            />
+
+            <YAxis
               yAxisId="demand"
               orientation="right"
+              domain={[0, 100]}
               label={{
                 value: "Demand Score",
                 angle: 90,
@@ -95,8 +69,12 @@ function SkillSalaryChart({ data }) {
 
             <Tooltip content={<CustomTooltip />} />
 
-          <Bar dataKey="salaryScore" yAxisId="salary" barSize={30} fill="#FFA500" />
-          {/* <Bar dataKey="demand" yAxisId="demand" barSize={30} /> */}
+            <Bar
+              dataKey="salary"
+              yAxisId="salary"
+              barSize={30}
+              fill="#FFA500"
+            />
 
             <Line
               type="monotone"
@@ -106,7 +84,7 @@ function SkillSalaryChart({ data }) {
               strokeWidth={4}
             />
 
-          </ComposedChart >
+          </ComposedChart>
         </ResponsiveContainer>
       </div>
     </div>
