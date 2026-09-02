@@ -9,6 +9,17 @@ import CountrySkillChart from "./components/CountrySkillChart";
 import Handwriting from "./components/Handwriting";
 
 function App() {
+  const highestSalary = skillSalary.reduce(
+    (highest, current) =>
+      current.salary > highest ? current.salary : highest,
+    0
+  );
+
+  console.log("App Highest Salary:", highestSalary);
+
+  const highestSalarySkill = skillSalary.find(
+  (item) => item.salary === highestSalary
+);
   return (
     <>
       <Navbar />

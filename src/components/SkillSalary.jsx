@@ -32,7 +32,13 @@ const highestSalary = data.reduce((highest, current) =>
   0
 );
 
+const highestSalarySkill = data.find(
+  (item) => item.salary === highestSalary
+);
+
   console.log("Highest Salary:", highestSalary);
+
+  console.log("Highest Salary Skill:", highestSalarySkill);
 
 const chartData = data.map((item) => ({
   skill: item.skill,
@@ -64,14 +70,14 @@ console.log("Best Opportunity:", bestOpportunity);
     <div className="chart-card">
       <h2>Average Salary by Skill</h2>
 
-<div className="best-opportunity">
-  <strong>Best Opportunity:</strong>{" "}
-  {bestOpportunity.skill} ({bestOpportunity.opportunityScore.toFixed(1)})
+    <div className="best-opportunity">
+      <strong>Best Opportunity:</strong>{" "}
+      {bestOpportunity.skill} ({bestOpportunity.opportunityScore.toFixed(1)})
 
-  <p>
-    Salary: ₹{bestOpportunity.salary} LPA | Demand: {bestOpportunity.demand}
-  </p>
-</div>
+      <p>
+        Salary: ₹{bestOpportunity.salary} LPA | Demand: {bestOpportunity.demand}
+      </p>
+    </div>
 
       <div className="chart-container">
         <ResponsiveContainer width="100%" height={350}>
