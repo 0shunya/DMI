@@ -73,7 +73,7 @@ function CitySkillChart({ data }) {
 
             <Legend />
 
-            <Bar dataKey="demand" fill="#8884d8" />
+            <Bar dataKey="demand" fill="#FFA500" />
           </BarChart>
         </ResponsiveContainer>
       </div>

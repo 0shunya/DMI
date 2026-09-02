@@ -77,7 +77,7 @@ const topSkill = chartData.reduce((highest, current) => current.demand > highest
 
             <Legend />
 
-            <Bar dataKey="demand" fill="#8884d8" />
+            <Bar dataKey="demand" fill="#FFA500" />
           </BarChart>
         </ResponsiveContainer>
       </div>
