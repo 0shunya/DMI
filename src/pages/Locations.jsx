@@ -3,6 +3,7 @@ import { useState } from "react";
 import "../styles/locations.css";
 
 import LocationJobsChart from "../components/LocationJobsChart";
+import LocationSkillChart from "../components/LocationSkillChart";
 
 import Navbar from "../components/Navbar";
 import Handwriting from "../components/Handwriting";
@@ -103,6 +104,7 @@ function Locations() {
         </section>
 
         <LocationJobsChart data={cityJobs} />
+        <LocationSkillChart city={citySkillData} />
 
       </main>
     </>
