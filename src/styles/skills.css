@@ -119,3 +119,45 @@
 .salary-fill {
   background: #FFA500;
 }
+
+/* Related Skills */
+
+.related-skills {
+  margin-top: 20px;
+  padding: 24px;
+
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+}
+
+.related-skills p {
+  color: #666;
+  margin: 10px 0 20px;
+}
+
+.related-skill {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+
+  padding: 14px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.related-skill:last-child {
+  border-bottom: none;
+}
+
+.related-skill span:first-child {
+  width: 35px;
+  font-weight: bold;
+}
+
+.related-skill strong {
+  flex: 1;
+}
+
+.related-skill span:last-child {
+  font-weight: bold;
+}

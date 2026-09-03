@@ -141,6 +141,20 @@ export const citySkillDemand = [
     JavaScript: 77,
     CSharp: 58,
   },
+    {
+    city: "Delhi",
+    Python: 55,
+    Java: 60,
+    JavaScript: 70,
+    CSharp: 58,
+  },
+    {
+    city: "Chennai",
+    Python: 75,
+    Java: 73,
+    JavaScript: 67,
+    CSharp: 50,
+  }
 ];
 
 //Country wise Data

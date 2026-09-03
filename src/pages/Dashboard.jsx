@@ -11,7 +11,7 @@ import {
 } from "../data/dashboardData.jsx";
 
 import SkillDemandChart from "../components/SkillDemandChart";
-import SkillSalaryChart from "../components/skillSalary.jsx";
+import SkillSalaryChart from "../components/SkillSalary.jsx";
 import CityJobsChart from "../components/CityJobsChart";
 import CitySkillChart from "../components/CitySkillChart";
 import CountrySkillChart from "../components/CountrySkillChart";
@@ -41,6 +41,7 @@ function Dashboard() {
       <Navbar />
 
       <main>
+        <Handwriting fontSize="30px">
         <h1>Developer Market Intelligence</h1>
 
         <p>Understand the programming job market.</p>
@@ -96,7 +97,7 @@ function Dashboard() {
           </section>
 
         </div>
-
+ </Handwriting>
         <div className="charts-grid">
 
           <SkillDemandChart data={skillDemand} />
@@ -110,6 +111,7 @@ function Dashboard() {
           <SkillSalaryChart data={skillSalary} />
 
         </div>
+       
       </main>
     </>
   );

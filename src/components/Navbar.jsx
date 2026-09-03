@@ -1,16 +1,25 @@
 import { Link } from "react-router-dom";
+import Handwriting from "../components/Handwriting";
 
 function Navbar() {
   return (
     <nav>
-      <h2>DevMarket</h2>
+       <Handwriting fontSize="20px"> 
+      <h2>DevMarket</h2> </Handwriting>
 
       <div>
-        <Link to="/">Dashboard</Link>
-        <Link to="/skills">Skills</Link>
-        <Link to="/locations">Locations</Link>
+        <Handwriting fontSize="20px" gap="24px">
+          <Link to="/">Dashboard</Link>
+        </Handwriting>
+        <Handwriting fontSize="20px" gap="24px"><Link to="/skills">Skills</Link></Handwriting>  
+        <Handwriting fontSize="20px" gap="24px"><Link to="/locations">Locations</Link></Handwriting>  
+        <Handwriting fontSize="20px" gap="24px"><Link to="/compare">Compare</Link></Handwriting>  
+        
+        {/* <Link to="/locations">Locations</Link>
         <Link to="/compare">Compare</Link>
+         */}
       </div>
+      {/* </Handwriting> */}
     </nav>
   );
 }
