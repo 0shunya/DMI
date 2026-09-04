@@ -2,12 +2,12 @@ import { useState } from "react";
 
 import "../styles/skills.css"
 
-import Navbar from "../components/Navbar";
-import Handwriting from "../components/Handwriting";
-import SkillAnalysisChart from "../components/SkillAnalysisChart";
+import Navbar from "../components/Navbar.jsx";
+import Handwriting from "../components/Handwriting.jsx";
+import SkillAnalysisChart from "../components/SkillAnalysisChart.jsx";
 
 import { skillSalary } from "../data/dashboardData.jsx";
-import { rankSkills } from "../utils/opportunityScore";
+import { rankSkills } from "../utils/opportunityScore.js";
 
 
 function Skills() {
@@ -28,7 +28,7 @@ const relatedSkills = rankedSkills
       <Navbar />
 
       <main>
-        <Handwriting fontSize="30px">
+        {/* <Handwriting fontSize="30px"> */}
         <h1>Skills Intelligence</h1>
 
         <p>
@@ -38,9 +38,10 @@ const relatedSkills = rankedSkills
         {/* Skill Selector */}
 
         <section className="skill-selector-card">
-          <Handwriting fontSize="30px">
+          {/* <Handwriting fontSize="30px"> */}
             Explore a Skill
-          </Handwriting>
+          {/* </Handwriting> */}
+          <div className="skill-selector">
 
           <label htmlFor="skill">Select Skill:</label>
 
@@ -57,6 +58,7 @@ const relatedSkills = rankedSkills
               </option>
             ))}
           </select>
+          </div>
         </section>
 
         {/* Skill Stats */}
@@ -102,9 +104,9 @@ const relatedSkills = rankedSkills
 />
 
 <section className="related-skills">
-  <Handwriting fontSize="30px">
+  {/* <Handwriting fontSize="30px"> */}
     What to Learn Next
-  </Handwriting>
+  {/* </Handwriting> */}
 
   <p>
     Other skills with strong market opportunity.
@@ -123,7 +125,7 @@ const relatedSkills = rankedSkills
   ))}
 </section>
 
-</Handwriting>
+{/* </Handwriting> */}
       </main>
     </>
   );

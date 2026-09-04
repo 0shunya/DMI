@@ -2,11 +2,11 @@ import { useState } from "react";
 
 import "../styles/locations.css";
 
-import LocationJobsChart from "../components/LocationJobsChart";
-import LocationSkillChart from "../components/LocationSkillChart";
+import LocationJobsChart from "../components/LocationJobsChart.jsx";
+import LocationSkillChart from "../components/LocationSkillChart.jsx";
 
-import Navbar from "../components/Navbar";
-import Handwriting from "../components/Handwriting";
+import Navbar from "../components/Navbar.jsx";
+// import Handwriting from "../components/Handwriting";
 
 import {
   cityJobs,
@@ -38,9 +38,9 @@ function Locations() {
         {/* City Selector */}
 
         <section className="location-selector-card">
-          <Handwriting fontSize="30px">
+          {/* <Handwriting fontSize="30px"> */}
             Explore a City
-          </Handwriting>
+          {/* </Handwriting> */}
 
           <label htmlFor="city">
             Select City:
@@ -92,9 +92,9 @@ function Locations() {
         {/* City Overview */}
 
         <section className="location-detail-card">
-          <Handwriting fontSize="32px">
+          {/* <Handwriting fontSize="32px"> */}
             {selectedCity}
-          </Handwriting>
+          {/* </Handwriting> */}
 
           <p>
             {selectedCity} has{" "}

@@ -2,11 +2,11 @@ import { useState } from "react";
 
 import "../styles/compare.css";
 
-import Navbar from "../components/Navbar";
-import Handwriting from "../components/Handwriting";
+import Navbar from "../components/Navbar.jsx";
+// import Handwriting from "../components/Handwriting";
 
 import { skillSalary } from "../data/dashboardData.jsx";
-import { rankSkills } from "../utils/opportunityScore";
+import { rankSkills } from "../utils/opportunityScore.js";
 
 function Compare() {
   const [skillOne, setSkillOne] = useState("Python");
@@ -43,9 +43,9 @@ function Compare() {
         <section className="compare-selector-card">
 
           <div className="compare-selector">
-            <Handwriting fontSize="28px">
+            {/* <Handwriting fontSize="28px"> */}
               Skill 1
-            </Handwriting>
+            {/* </Handwriting> */}
 
             <select
               value={skillOne}
@@ -71,9 +71,9 @@ function Compare() {
 
 
           <div className="compare-selector">
-            <Handwriting fontSize="28px">
+            {/* <Handwriting fontSize="28px"> */}
               Skill 2
-            </Handwriting>
+            {/* </Handwriting> */}
 
             <select
               value={skillTwo}
@@ -149,9 +149,9 @@ function Compare() {
         </section>
 
         <section className="comparison-result">
-  <Handwriting fontSize="30px">
+  {/* <Handwriting fontSize="30px"> */}
     Better Opportunity
-  </Handwriting>
+  {/* </Handwriting> */}
 
   <h2>{winner.skill}</h2>
 

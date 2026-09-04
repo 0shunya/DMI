@@ -161,3 +161,7 @@
 .related-skill span:last-child {
   font-weight: bold;
 }
+
+.skill-selector {
+  margin: 15px 0 20px;
+}
