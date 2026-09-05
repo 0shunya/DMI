@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from scraper import scrape_job_data;
 from fastapi.middleware.cors import CORSMiddleware;
 from skill_extractor import analyze_jobs
+from skill_extractor import extract_skills
 
 app = FastAPI()
 
@@ -78,3 +79,35 @@ def get_locations():
             reverse=True
         )
     ]
+@app.get("/api/location-skills")
+def get_location_skills():
+
+    jobs = scrape_job_data(results_wanted=20)
+
+    location_skill_counts = {}
+
+    for _, job in jobs.iterrows():
+
+        location = job.get("location")
+
+        if not location:
+            continue
+
+        title = str(job.get("title", ""))
+        description = str(job.get("description", ""))
+
+        text = f"{title} {description}"
+
+        found_skills = extract_skills(text)
+
+        if location not in location_skill_counts:
+            location_skill_counts[location] = {}
+
+        for skill in found_skills:
+
+            if skill not in location_skill_counts[location]:
+                location_skill_counts[location][skill] = 0
+
+            location_skill_counts[location][skill] += 1
+
+    return location_skill_counts
