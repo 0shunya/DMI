@@ -10,6 +10,7 @@ import {
   countrySkillDemand,
 } from "../data/dashboardData.jsx";
 
+import LiveJobs from "../components/LiveJobs";
 import SkillDemandChart from "../components/SkillDemandChart.jsx";
 import SkillSalaryChart from "../components/SkillSalary.jsx";
 import CityJobsChart from "../components/CityJobsChart.jsx";
@@ -149,6 +150,8 @@ function Dashboard() {
              <div className="full-width-chart">
   <CityJobsChart data={cityJobs} />
 </div>
+
+<LiveJobs />
 
           </div>
         </section>

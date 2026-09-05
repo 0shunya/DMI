@@ -557,3 +557,177 @@ body {
   }
 
 }
+
+/* ==============================
+   LIVE JOB MARKET
+============================== */
+
+.live-jobs {
+  margin-top: 40px;
+  padding: 28px;
+
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.live-jobs:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+}
+
+
+/* Header */
+
+.live-jobs-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 24px;
+}
+
+.live-jobs-header h2 {
+  margin: 0 0 6px;
+
+  font-size: 24px;
+}
+
+.live-jobs-header p {
+  margin: 0;
+
+  color: #64748b;
+  font-size: 14px;
+}
+
+
+/* Refresh button */
+
+.live-jobs-header button {
+  padding: 9px 16px;
+
+  background: #111827;
+  color: white;
+
+  border: none;
+  border-radius: 6px;
+
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.live-jobs-header button:hover {
+  background: #374151;
+  transform: translateY(-1px);
+}
+
+
+/* Jobs list */
+
+.jobs-list {
+  display: flex;
+  flex-direction: column;
+}
+
+
+/* Individual job */
+
+.job-row {
+  display: grid;
+  grid-template-columns: 1fr 150px 100px;
+  align-items: center;
+
+  gap: 20px;
+
+  padding: 18px 0;
+
+  border-top: 1px solid #f1f5f9;
+}
+
+
+/* Job title */
+
+.job-row strong {
+  display: block;
+
+  margin-bottom: 6px;
+
+  font-size: 15px;
+  font-weight: 600;
+}
+
+
+/* Company */
+
+.job-row p {
+  margin: 0;
+
+  color: #64748b;
+  font-size: 14px;
+}
+
+
+/* Location */
+
+.job-row > span {
+  color: #64748b;
+
+  font-size: 14px;
+}
+
+
+/* View Job */
+
+.job-row a {
+  color: #111827;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  text-decoration: none;
+
+  transition: color 0.2s ease;
+}
+
+.job-row a:hover {
+  color: #64748b;
+  text-decoration: underline;
+}
+
+
+/* ==============================
+   LIVE JOBS RESPONSIVE
+============================== */
+
+@media (max-width: 768px) {
+
+  .live-jobs {
+    padding: 20px;
+  }
+
+  .live-jobs-header {
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .job-row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .job-row a {
+    width: fit-content;
+  }
+}
