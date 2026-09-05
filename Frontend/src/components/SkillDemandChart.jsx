@@ -16,7 +16,7 @@ function CustomTooltip({ active, payload, label }) {
   return (
     <div className="custom-tooltip">
       <p><strong>{label}</strong></p>
-      <p>Demand Score: {payload[0].value}</p>
+      <p>Jobs: {payload[0].value}</p>
     </div>
   );
 }
@@ -24,7 +24,14 @@ function CustomTooltip({ active, payload, label }) {
 function SkillDemandChart({ data }) {
   return (
     <div className="chart-card">
-      <h2>Most Demanded Skills</h2>
+      <div className="chart-header">
+  <h2>Most Demanded Skills</h2>
+
+  <span className="live-indicator">
+    <span className="live-dot"></span>
+    LIVE
+  </span>
+</div>
 
       <div className="chart-container">
         <ResponsiveContainer width="100%" height={350}>
@@ -35,7 +42,7 @@ function SkillDemandChart({ data }) {
 
             <YAxis
               label={{
-                value: "Demand Score",
+                value: "Jobs Mentioning Skill",
                 angle: -90,
                 position: "insideLeft",
               }}

@@ -24,7 +24,7 @@ function CustomTooltip({ active, payload, label }) {
 function CityJobsChart({ data }) {
   return (
     <div className="chart-card">
-      <h2>Developer Jobs by City</h2>
+      <h2>Jobs by Region</h2>
 
       <div className="chart-container">
         <ResponsiveContainer width="100%" height={350}>

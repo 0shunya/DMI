@@ -16,6 +16,8 @@ import SkillSalaryChart from "../components/SkillSalary.jsx";
 import CityJobsChart from "../components/CityJobsChart.jsx";
 import CitySkillChart from "../components/CitySkillChart.jsx";
 import CountrySkillChart from "../components/CountrySkillChart.jsx";
+import LiveSkillDemand from "../components/LiveSkillDemand";
+import LiveCityJobs from "../components/LiveCityJobs";
 
 import {
   findBestOpportunity,
@@ -126,7 +128,7 @@ function Dashboard() {
 
           <div className="charts-grid">
 
-            <SkillDemandChart data={skillDemand} />
+            <LiveSkillDemand />
 
             <SkillSalaryChart data={skillSalary} />
 
@@ -148,8 +150,8 @@ function Dashboard() {
             <CountrySkillChart data={countrySkillDemand} />
 
              <div className="full-width-chart">
-  <CityJobsChart data={cityJobs} />
-</div>
+              <LiveCityJobs />
+            </div>
 
 <LiveJobs />
 
