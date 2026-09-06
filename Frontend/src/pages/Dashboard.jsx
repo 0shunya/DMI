@@ -19,6 +19,7 @@ import CountrySkillChart from "../components/CountrySkillChart.jsx";
 import LiveSkillDemand from "../components/LiveSkillDemand";
 import LiveCityJobs from "../components/LiveCityJobs";
 import LiveCitySkill from "../components/LiveCitySkill.jsx"
+import LiveCountrySkills from "../components/LiveCountrySkills.jsx";
 
 import {
   findBestOpportunity,
@@ -148,7 +149,7 @@ function Dashboard() {
 
             <LiveCitySkill />
 
-            <CountrySkillChart data={countrySkillDemand} />
+            <LiveCountrySkills />
 
              <div className="full-width-chart">
               <LiveCityJobs />

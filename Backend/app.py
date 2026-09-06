@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from scraper import scrape_job_data;
+from scraper import scrape_job_data, scrape_multiple_countries
 from fastapi.middleware.cors import CORSMiddleware;
 from skill_extractor import analyze_jobs
 from skill_extractor import extract_skills
@@ -111,3 +111,31 @@ def get_location_skills():
             location_skill_counts[location][skill] += 1
 
     return location_skill_counts
+
+@app.get("/api/country-skills")
+def get_country_skills():
+
+    jobs = scrape_multiple_countries(
+        results_per_country=20
+    )
+
+    if jobs.empty:
+        return {}
+
+    country_skill_counts = {}
+
+    for country in jobs["country"].dropna().unique():
+
+        country_jobs = jobs[
+            jobs["country"] == country
+        ]
+
+        skill_counts = analyze_jobs(country_jobs)
+
+        country_skill_counts[country] = {
+            skill: count
+            for skill, count in skill_counts.items()
+            if count > 0
+        }
+
+    return country_skill_counts
