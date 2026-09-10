@@ -1,169 +1,22 @@
 import { useState } from "react";
-
-import "../styles/compare.css";
-
 import Navbar from "../components/Navbar.jsx";
-// import Handwriting from "../components/Handwriting";
-
 import { skillSalary } from "../data/dashboardData.jsx";
 import { rankSkills } from "../utils/opportunityScore.js";
 
+function SelectSkill({ label, value, onChange }) { return <label className="field-label">{label}<select value={value} onChange={(event) => onChange(event.target.value)}>{skillSalary.map((item) => <option key={item.skill}>{item.skill}</option>)}</select></label>; }
 function Compare() {
   const [skillOne, setSkillOne] = useState("Python");
   const [skillTwo, setSkillTwo] = useState("Java");
-
   const rankedSkills = rankSkills(skillSalary);
-
-  const firstSkill = rankedSkills.find(
-    (item) => item.skill === skillOne
-  );
-
-  const secondSkill = rankedSkills.find(
-    (item) => item.skill === skillTwo
-  );
-
-  const winner =
-  firstSkill.opportunityScore >= secondSkill.opportunityScore
-    ? firstSkill
-    : secondSkill;
-
-  return (
-    <>
-      <Navbar />
-
-      <main>
-        <h1>Compare Skills</h1>
-
-        <p>
-          Compare developer skills by demand, salary, and opportunity.
-        </p>
-
-        {/* Skill Selectors */}
-
-        <section className="compare-selector-card">
-
-          <div className="compare-selector">
-            {/* <Handwriting fontSize="28px"> */}
-              Skill 1
-            {/* </Handwriting> */}
-
-            <select
-              value={skillOne}
-              onChange={(event) =>
-                setSkillOne(event.target.value)
-              }
-            >
-              {skillSalary.map((item) => (
-                <option
-                  key={item.skill}
-                  value={item.skill}
-                >
-                  {item.skill}
-                </option>
-              ))}
-            </select>
-          </div>
-
-
-          <div className="compare-vs">
-            VS
-          </div>
-
-
-          <div className="compare-selector">
-            {/* <Handwriting fontSize="28px"> */}
-              Skill 2
-            {/* </Handwriting> */}
-
-            <select
-              value={skillTwo}
-              onChange={(event) =>
-                setSkillTwo(event.target.value)
-              }
-            >
-              {skillSalary.map((item) => (
-                <option
-                  key={item.skill}
-                  value={item.skill}
-                >
-                  {item.skill}
-                </option>
-              ))}
-            </select>
-          </div>
-
-        </section>
-
-        {/* Comparison */}
-
-        <section className="comparison-card">
-
-          <div className="comparison-column">
-            <h2>{firstSkill.skill}</h2>
-
-            <p>
-              Demand
-              <strong>{firstSkill.demand}</strong>
-            </p>
-
-            <p>
-              Salary
-              <strong>₹{firstSkill.salary} LPA</strong>
-            </p>
-
-            <p>
-              Opportunity
-              <strong>
-                {firstSkill.opportunityScore.toFixed(1)}
-              </strong>
-            </p>
-          </div>
-
-
-          <div className="comparison-divider">
-            VS
-          </div>
-
-
-          <div className="comparison-column">
-            <h2>{secondSkill.skill}</h2>
-
-            <p>
-              Demand
-              <strong>{secondSkill.demand}</strong>
-            </p>
-
-            <p>
-              Salary
-              <strong>₹{secondSkill.salary} LPA</strong>
-            </p>
-
-            <p>
-              Opportunity
-              <strong>
-                {secondSkill.opportunityScore.toFixed(1)}
-              </strong>
-            </p>
-          </div>
-
-        </section>
-
-        <section className="comparison-result">
-  {/* <Handwriting fontSize="30px"> */}
-    Better Opportunity
-  {/* </Handwriting> */}
-
-  <h2>{winner.skill}</h2>
-
-  <p>
-    {winner.skill} has the higher opportunity score of{" "}
-    <strong>{winner.opportunityScore.toFixed(1)}</strong>.
-  </p>
-</section>
-
-      </main>
-    </>
-  );
+  const first = rankedSkills.find((item) => item.skill === skillOne) || rankedSkills[0];
+  const second = rankedSkills.find((item) => item.skill === skillTwo) || rankedSkills[1];
+  const winner = first.opportunityScore >= second.opportunityScore ? first : second;
+  return <><Navbar /><main className="page-shell compare-page">
+    <div className="page-kicker"><span>13</span> COMPARISON DESK <span className="kicker-rule" /> TWO SKILLS, ONE VIEW</div>
+    <section className="compare-hero"><p className="eyebrow">MAKE THE TRADE-OFF VISIBLE</p><h1>Skill against skill<em>.</em></h1><p className="lede">Compare demand, salary, and opportunity without pretending that one number can make the decision for you.</p></section>
+    <section className="compare-controls"><SelectSkill label="SKILL ONE" value={skillOne} onChange={setSkillOne} /><span className="versus">VS</span><SelectSkill label="SKILL TWO" value={skillTwo} onChange={setSkillTwo} /></section>
+    <section className="comparison-table"><div className="comparison-head"><span>MEASURE</span><strong>{first.skill}</strong><strong>{second.skill}</strong></div>{[["Demand", first.demand, second.demand], ["Average salary", `₹${first.salary} LPA`, `₹${second.salary} LPA`], ["Opportunity", first.opportunityScore.toFixed(1), second.opportunityScore.toFixed(1)]].map(([label, a, b]) => <div className="comparison-row" key={label}><span>{label}</span><strong className={a === Math.max(a, b) ? "leading" : ""}>{a}</strong><strong className={b === Math.max(a, b) ? "leading" : ""}>{b}</strong></div>)}</section>
+    <section className="verdict"><div><span className="section-number">14</span><h2>The short version</h2></div><div><p><strong>{winner.skill}</strong> leads on overall opportunity in the current sample.</p><p className="muted">Choose based on the market you want to enter, the work you want to do, and the evidence—not on a score alone.</p></div></section>
+  </main></>;
 }
-
 export default Compare;

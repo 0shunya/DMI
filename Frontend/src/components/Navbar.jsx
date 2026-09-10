@@ -1,155 +1,61 @@
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
 
+const links = [
+  ["/", "Briefing"],
+  ["/skills", "Skills"],
+  ["/locations", "Places"],
+  ["/compare", "Compare"],
+];
+
 function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const closeMenu = () => {
-    setMenuOpen(false);
-  };
-
   return (
     <>
-      <nav className="navbar">
-
-        <NavLink
-          to="/"
-          className="navbar-brand"
-          onClick={closeMenu}
-        >
-          DevMarket
+      <header className="site-header">
+        <NavLink to="/" className="brand" onClick={() => setMenuOpen(false)}>
+          <span className="brand-mark">DMI</span>
+          <span className="brand-name">Developer Market Intelligence</span>
         </NavLink>
 
-        {/* Desktop Navigation */}
+        <nav className="desktop-nav" aria-label="Primary navigation">
+          {links.map(([to, label]) => (
+            <NavLink
+              key={to}
+              to={to}
+              end={to === "/"}
+              className={({ isActive }) => `nav-link ${isActive ? "active" : ""}`}
+            >
+              {label}
+            </NavLink>
+          ))}
+        </nav>
 
-        <div className="navbar-links">
-
-          <NavLink
-            to="/"
-            className={({ isActive }) =>
-              isActive ? "nav-link active" : "nav-link"
-            }
-          >
-            Dashboard
-          </NavLink>
-
-          <NavLink
-            to="/skills"
-            className={({ isActive }) =>
-              isActive ? "nav-link active" : "nav-link"
-            }
-          >
-            Skills
-          </NavLink>
-
-          <NavLink
-            to="/locations"
-            className={({ isActive }) =>
-              isActive ? "nav-link active" : "nav-link"
-            }
-          >
-            Locations
-          </NavLink>
-
-          <NavLink
-            to="/compare"
-            className={({ isActive }) =>
-              isActive ? "nav-link active" : "nav-link"
-            }
-          >
-            Compare
-          </NavLink>
-
-        </div>
-
-        {/* Mobile Menu Button */}
-
-        <button
-          className="menu-button"
-          onClick={() => setMenuOpen(true)}
-          aria-label="Open navigation menu"
-        >
-          <span></span>
-          <span></span>
-          <span></span>
-        </button>
-
-      </nav>
-
-      {/* Mobile Side Menu */}
-
-      <div
-        className={`mobile-menu ${menuOpen ? "open" : ""}`}
-      >
-
-        <div className="mobile-menu-header">
-
-          <span>Menu</span>
-
-          <button
-            className="close-button"
-            onClick={closeMenu}
-            aria-label="Close navigation menu"
-          >
-            ×
+        <div className="header-meta">
+          <span className="edition">EDITION 09.10.26</span>
+          <button className="menu-button" onClick={() => setMenuOpen(true)} aria-label="Open navigation">
+            <span />
+            <span />
           </button>
-
         </div>
+      </header>
 
+      <aside className={`mobile-menu ${menuOpen ? "open" : ""}`} aria-hidden={!menuOpen}>
+        <div className="mobile-menu-header">
+          <span className="eyebrow">NAVIGATION</span>
+          <button className="close-button" onClick={() => setMenuOpen(false)} aria-label="Close navigation">×</button>
+        </div>
         <div className="mobile-menu-links">
-
-          <NavLink
-            to="/"
-            className={({ isActive }) =>
-              isActive ? "mobile-nav-link active" : "mobile-nav-link"
-            }
-            onClick={closeMenu}
-          >
-            Dashboard
-          </NavLink>
-
-          <NavLink
-            to="/skills"
-            className={({ isActive }) =>
-              isActive ? "mobile-nav-link active" : "mobile-nav-link"
-            }
-            onClick={closeMenu}
-          >
-            Skills
-          </NavLink>
-
-          <NavLink
-            to="/locations"
-            className={({ isActive }) =>
-              isActive ? "mobile-nav-link active" : "mobile-nav-link"
-            }
-            onClick={closeMenu}
-          >
-            Locations
-          </NavLink>
-
-          <NavLink
-            to="/compare"
-            className={({ isActive }) =>
-              isActive ? "mobile-nav-link active" : "mobile-nav-link"
-            }
-            onClick={closeMenu}
-          >
-            Compare
-          </NavLink>
-
+          {links.map(([to, label]) => (
+            <NavLink key={to} to={to} end={to === "/"} onClick={() => setMenuOpen(false)} className="mobile-nav-link">
+              {label}
+            </NavLink>
+          ))}
         </div>
-
-      </div>
-
-      {/* Background Overlay */}
-
-      {menuOpen && (
-        <div
-          className="menu-overlay"
-          onClick={closeMenu}
-        ></div>
-      )}
+        <p className="mobile-note">A plain-language field guide to developer demand, salary, skills, and place.</p>
+      </aside>
+      {menuOpen && <button className="menu-overlay" onClick={() => setMenuOpen(false)} aria-label="Close menu" />}
     </>
   );
 }

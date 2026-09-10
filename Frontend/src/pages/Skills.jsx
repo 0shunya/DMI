@@ -1,134 +1,22 @@
 import { useState } from "react";
-
-import "../styles/skills.css"
-
 import Navbar from "../components/Navbar.jsx";
-import Handwriting from "../components/Handwriting.jsx";
 import SkillAnalysisChart from "../components/SkillAnalysisChart.jsx";
-
 import { skillSalary } from "../data/dashboardData.jsx";
 import { rankSkills } from "../utils/opportunityScore.js";
 
-
 function Skills() {
   const [selectedSkill, setSelectedSkill] = useState("Python");
+  const rankedSkills = rankSkills(skillSalary);
+  const skillData = rankedSkills.find((item) => item.skill === selectedSkill) || rankedSkills[0];
+  const relatedSkills = rankedSkills.filter((item) => item.skill !== selectedSkill).slice(0, 3);
 
-const rankedSkills = rankSkills(skillSalary);
-
-const skillData = rankedSkills.find(
-  (item) => item.skill === selectedSkill
-);
-
-const relatedSkills = rankedSkills
-  .filter((item) => item.skill !== selectedSkill)
-  .slice(0, 3);
-
-  return (
-    <>
-      <Navbar />
-
-      <main>
-        {/* <Handwriting fontSize="30px"> */}
-        <h1>Skills Intelligence</h1>
-
-        <p>
-          Explore demand, salary, and opportunity for each skill.
-        </p>
-
-        {/* Skill Selector */}
-
-        <section className="skill-selector-card">
-          {/* <Handwriting fontSize="30px"> */}
-            Explore a Skill
-          {/* </Handwriting> */}
-          <div className="skill-selector">
-
-          <label htmlFor="skill">Select Skill:</label>
-
-          <select
-            id="skill"
-            value={selectedSkill}
-            onChange={(event) =>
-              setSelectedSkill(event.target.value)
-            }
-          >
-            {skillSalary.map((item) => (
-              <option key={item.skill} value={item.skill}>
-                {item.skill}
-              </option>
-            ))}
-          </select>
-          </div>
-        </section>
-
-        {/* Skill Stats */}
-
-<section className="skill-stats">
-
-  <div className="skill-stat-card">
-    <p>Demand Score</p>
-    <h2>{skillData.demand}</h2>
-  </div>
-
-  <div className="skill-stat-card">
-    <p>Average Salary</p>
-    <h2>₹{skillData.salary} LPA</h2>
-  </div>
-
-  <div className="skill-stat-card">
-    <p>Opportunity Score</p>
-    <h2>
-      {skillData.opportunityScore.toFixed(1)}
-    </h2>
-  </div>
-
-</section>
-
-        {/* Selected Skill */}
-
-        <section className="skill-detail-card">
-          <Handwriting fontSize="32px">
-            {selectedSkill}
-          </Handwriting>
-
-          <p>
-            {selectedSkill} has a demand score of{" "}
-            <strong>{skillData.demand}</strong> and an average
-            salary of <strong>₹{skillData.salary} LPA</strong>.
-          </p>
-        </section>
-
-       <SkillAnalysisChart
-  skill={skillData}
-  maxSalary={Math.max(...skillSalary.map((item) => item.salary))}
-/>
-
-<section className="related-skills">
-  {/* <Handwriting fontSize="30px"> */}
-    What to Learn Next
-  {/* </Handwriting> */}
-
-  <p>
-    Other skills with strong market opportunity.
-  </p>
-
-  {relatedSkills.map((skill, index) => (
-    <div className="related-skill" key={skill.skill}>
-      <span>#{index + 1}</span>
-
-      <strong>{skill.skill}</strong>
-
-      <span>
-        {skill.opportunityScore.toFixed(1)}
-      </span>
-    </div>
-  ))}
-</section>
-
-{/* </Handwriting> */}
-      </main>
-    </>
-  );
+  return <><Navbar /><main className="page-shell profile-page">
+    <div className="page-kicker"><span>05</span> SKILL PROFILE <span className="kicker-rule" /> CURRENT SAMPLE</div>
+    <section className="profile-hero"><div><p className="eyebrow">EXPLORE THE MARKET BY SKILL</p><h1>{skillData.skill}<em>.</em></h1><p className="lede">A practical reading of demand, salary, and opportunity for one developer skill.</p></div><label className="field-label" htmlFor="skill">SELECT A SKILL<select id="skill" value={selectedSkill} onChange={(event) => setSelectedSkill(event.target.value)}>{skillSalary.map((item) => <option key={item.skill}>{item.skill}</option>)}</select></label></section>
+    <section className="metric-strip">{[["Demand score "," ", skillData.demand], ["Average salary ", " ", `₹${skillData.salary} LPA`], ["Opportunity score ", skillData.opportunityScore.toFixed(1)]].map(([label, value]) => <div className="metric-cell" key={label}><span>{label}</span><strong>{value}</strong></div>)}</section>
+    <section className="profile-reading"><div><span className="section-number">06</span><h2>Our read</h2></div><p><strong>{selectedSkill}</strong> has a demand score of <strong>{skillData.demand}</strong> and an average salary of <strong>₹{skillData.salary} LPA</strong>. The score is comparative: it shows how this skill sits against the other skills in the current dataset, not what any individual candidate will earn.</p></section>
+    <section className="section-block"><div className="section-heading"><div><span className="section-number">07</span><h2>Demand versus pay</h2></div><p>Use this view to see whether market attention and compensation move together.</p></div><SkillAnalysisChart skill={skillData} maxSalary={Math.max(...skillSalary.map((item) => item.salary))} /></section>
+    <section className="related-skills"><div><span className="section-number">08</span><h2>What to learn next</h2><p>Other skills with strong market opportunity.</p></div><div className="related-list">{relatedSkills.map((skill, index) => <div className="related-skill" key={skill.skill}><span>0{index + 1}</span><strong>{skill.skill}</strong><span>{skill.opportunityScore.toFixed(1)} opportunity</span></div>)}</div></section>
+  </main></>;
 }
-
 export default Skills;
