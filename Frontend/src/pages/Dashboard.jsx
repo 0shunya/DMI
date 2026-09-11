@@ -67,7 +67,7 @@ function Dashboard() {
                 <strong> ₹
                 <CountUp
                   from={0}
-                  to={highestSalary.salary.toFixed(1)}
+                  to={Number(highestSalary.salary.toFixed(1))}
                   separator=","
                   direction="up"
                   duration={1}
@@ -91,7 +91,64 @@ function Dashboard() {
         <section className="section-block">
           <div className="section-heading"><div><span className="section-number">02</span><h2>The market at a glance</h2></div><p>Four numbers to orient yourself before the detail.</p></div>
           <div className="glance-grid">
-            {stats.map((stat, index) => <div className="glance-item" key={stat.title}><span className="item-index">0{index + 1}</span><span className="glance-label">{stat.title}</span><strong>{stat.value}</strong></div>)}
+            
+            {/* {stats.map((stat, index) => 
+            
+            <div className="glance-item" key={stat.title}>
+              <span className="item-index">0{index + 1}</span>
+              <span className="glance-label">{stat.title}</span>
+              <strong>
+                {stat.value}  
+                </strong></div>)} */}
+
+
+
+{stats.map((stat, index) => {
+  const numericValue = Number(
+    String(stat.value).replace(/,/g, "")
+  );
+
+  const isNumeric = Number.isFinite(numericValue);
+
+  return (
+    <div className="glance-item" key={stat.title}>
+      <span className="item-index">0{index + 1}</span>
+
+      <span className="glance-label">
+        {stat.title}
+      </span>
+
+<strong>
+  {isNumeric ? (
+    <>
+      {stat.title === "AVERAGE SALARY" && "₹"}
+
+      <CountUp
+        from={0}
+        to={numericValue}
+        separator=","
+        direction="up"
+        duration={1}
+        className="count-up-text"
+        style={{
+          fontWeight: "inherit",
+          fontSize: "inherit",
+          color: "inherit",
+          whiteSpace: "nowrap",
+          display: "inline-block",
+        }}
+      />
+
+      {stat.title === "AVERAGE SALARY" && " LPA"}
+    </>
+  ) : (
+    stat.value
+  )}
+</strong> 
+    </div>
+  );
+})}
+
           </div>
         </section>
 
