@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import {
   BarChart,
@@ -29,24 +29,31 @@ function CustomTooltip({ active, payload, label }) {
 function CountrySkillChart({ data }) {
   const [selectedCountry, setSelectedCountry] = useState("");
 
+  const activeCountry =
+  data.some((item) => item.country === selectedCountry)
+    ? selectedCountry
+    : data[0]?.country || "";
+
+
   // Select the first available country when live data arrives
-  useEffect(() => {
-    if (data.length > 0) {
-      setSelectedCountry((currentCountry) => {
-        const stillExists = data.some(
-          (item) => item.country === currentCountry
-        );
+  // useEffect(() => {
+  //   if (data.length > 0) {
+  //     setSelectedCountry((currentCountry) => {
+  //       const stillExists = data.some(
+  //         (item) => item.country === currentCountry
+  //       );
 
-        return stillExists
-          ? currentCountry
-          : data[0].country;
-      });
-    }
-  }, [data]);
+  //       return stillExists
+  //         ? currentCountry
+  //         : data[0].country;
+  //     });
+  //   }
+  // }, [data]);
 
-  const countryData = data.find(
-    (item) => item.country === selectedCountry
-  );
+const countryData = data.find(
+  (item) => item.country === activeCountry
+);
+
 
   // Wait until a country has been selected
   if (!countryData) {
@@ -81,7 +88,7 @@ function CountrySkillChart({ data }) {
 
         <select
           id="country"
-          value={selectedCountry}
+          value={activeCountry}
           onChange={(event) =>
             setSelectedCountry(event.target.value)
           }

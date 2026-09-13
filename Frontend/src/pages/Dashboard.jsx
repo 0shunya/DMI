@@ -6,17 +6,19 @@ import {
   stats,
   skillSalary,
 } from "../data/dashboardData.jsx";
-import LiveJobs from "../components/LiveJobs";
+// import LiveJobs from "../components/LiveJobs";
 import SkillDemandChart from "../components/SkillDemandChart.jsx";
 import SkillSalaryChart from "../components/SkillSalary.jsx";
 import LiveCityJobs from "../components/LiveCityJobs";
 import LiveCitySkill from "../components/LiveCitySkill.jsx";
 import LiveCountrySkills from "../components/LiveCountrySkills.jsx";
-import { findBestOpportunity, rankSkills } from "../utils/opportunityScore.js";
+// import { rankSkills } from "../utils/opportunityScore.js";
+import { findBestOpportunity } from "../utils/opportunityScore.js";
+
 
 function Dashboard() {
   const bestOpportunity = findBestOpportunity(skillSalary);
-  const rankedSkills = rankSkills(skillSalary);
+  // const rankedSkills = rankSkills(skillSalary);
   const highestSalary = [...skillSalary].sort((a, b) => b.salary - a.salary)[0];
 
   return (

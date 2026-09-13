@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import {
   BarChart,
@@ -29,25 +29,32 @@ function CustomTooltip({ active, payload, label }) {
 function CitySkillChart({ data }) {
   const [selectedRegion, setSelectedRegion] = useState("");
 
-  // Select the first region when live data arrives
-  useEffect(() => {
-    if (data.length > 0) {
-      setSelectedRegion((currentRegion) => {
-        const exists = data.some(
-          (region) => region.location === currentRegion
-        );
+  const activeRegion =
+  data.some((region) => region.location === selectedRegion)
+    ? selectedRegion
+    : data[0]?.location || "";
 
-        return exists
-          ? currentRegion
-          : data[0].location;
-      });
-    }
-  }, [data]);
+
+  // Select the first region when live data arrives
+  // useEffect(() => {
+  //   if (data.length > 0) {
+  //     setSelectedRegion((currentRegion) => {
+  //       const exists = data.some(
+  //         (region) => region.location === currentRegion
+  //       );
+
+  //       return exists
+  //         ? currentRegion
+  //         : data[0].location;
+  //     });
+  //   }
+  // }, [data]);
 
   // Find the selected region
-  const cityData = data.find(
-    (region) => region.location === selectedRegion
-  );
+const cityData = data.find(
+  (region) => region.location === activeRegion
+);
+
 
   if (!cityData) {
     return (
@@ -95,7 +102,7 @@ function CitySkillChart({ data }) {
 
         <select
           id="region"
-          value={selectedRegion}
+          value={activeRegion}
           onChange={(event) =>
             setSelectedRegion(event.target.value)
           }
