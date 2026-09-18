@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { API_URL } from "../config.js";
 
 import SkillDemandChart from "./SkillDemandChart";
 
@@ -11,7 +12,7 @@ function LiveSkillDemand() {
     const fetchSkills = async () => {
       try {
         const response = await fetch(
-          "http://127.0.0.1:8000/api/skills"
+            `${API_URL}/api/skills`
         );
 
         if (!response.ok) {

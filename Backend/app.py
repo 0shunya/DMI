@@ -1,17 +1,30 @@
+import os
 from fastapi import FastAPI
 from scraper import scrape_job_data, scrape_multiple_countries
 from fastapi.middleware.cors import CORSMiddleware;
 from skill_extractor import analyze_jobs
 from skill_extractor import extract_skills
 
+
+def get_allowed_origins():
+    configured_origins = os.getenv("CORS_ORIGINS", "")
+
+    if configured_origins:
+        return [
+            origin.strip()
+            for origin in configured_origins.split(",")
+            if origin.strip()
+        ]
+    return [
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+    ]
+
 app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-    ],
+    allow_origins=get_allowed_origins(),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -21,6 +34,10 @@ app.add_middleware(
 @app.get("/")
 def home():
     return {"message": "DevMarket Intelligence API is running"}
+
+@app.get("/health")
+def health():
+    return {"status": "ok"}
 
 
 @app.get("/api/jobs")

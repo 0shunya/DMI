@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { API_URL } from "../config.js";
 
 import CountrySkillChart from "./CountrySkillChart";
 
@@ -11,7 +12,7 @@ function LiveCountrySkills() {
     const fetchCountrySkills = async () => {
       try {
         const response = await fetch(
-          "http://127.0.0.1:8000/api/country-skills"
+            `${API_URL}/api/country-skills`
         );
 
         if (!response.ok) {

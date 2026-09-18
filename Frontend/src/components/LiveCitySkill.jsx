@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { API_URL } from "../config.js";
 
 import CitySkillChart from "./CitySkillChart";
 
@@ -11,7 +12,7 @@ function LiveCitySkill() {
     const fetchLocationSkills = async () => {
       try {
         const response = await fetch(
-          "http://127.0.0.1:8000/api/location-skills"
+            `${API_URL}/api/location-skills`
         );
 
         if (!response.ok) {

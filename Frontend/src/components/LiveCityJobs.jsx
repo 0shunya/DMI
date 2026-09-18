@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { API_URL } from "../config.js";
+
 
 import CityJobsChart from "./CityJobsChart";
 
@@ -11,7 +13,7 @@ function LiveCityJobs() {
     const fetchLocations = async () => {
       try {
         const response = await fetch(
-          "http://127.0.0.1:8000/api/locations"
+            `${API_URL}/api/locations`
         );
 
         if (!response.ok) {

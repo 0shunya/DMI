@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { API_URL } from "../config.js";
+
 
 function LiveJobs() {
   const [jobs, setJobs] = useState([]);
@@ -11,7 +13,7 @@ function LiveJobs() {
       setError("");
 
       const response = await fetch(
-        "http://127.0.0.1:8000/api/jobs"
+        `${API_URL}/api/jobs`
       );
 
       if (!response.ok) {
@@ -29,9 +31,12 @@ function LiveJobs() {
     }
   };
 
-  useEffect(() => {
-    fetchJobs();
-  }, []);
+useEffect(() => {
+  // Intentional mount-time network request for live job data.
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  fetchJobs();
+}, []);
+
 
   return (
     <section className="live-jobs">
