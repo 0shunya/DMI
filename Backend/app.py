@@ -4,6 +4,8 @@ from scraper import scrape_job_data, scrape_multiple_countries
 from fastapi.middleware.cors import CORSMiddleware;
 from skill_extractor import analyze_jobs
 from skill_extractor import extract_skills
+import time
+
 
 
 def get_allowed_origins():
@@ -21,6 +23,37 @@ def get_allowed_origins():
     ]
 
 app = FastAPI()
+
+jobs_cache = {
+    "data": None,
+    "expires_at": 0,
+}
+
+country_skills_cache = {
+    "data": None,
+    "expires_at": 0,
+}
+
+CACHE_TTL_SECONDS = 900
+
+
+def get_cached_jobs():
+    now = time.time()
+
+    if (
+        jobs_cache["data"] is not None
+        and now < jobs_cache["expires_at"]
+    ):
+        return jobs_cache["data"]
+
+    jobs = scrape_job_data(results_wanted=20)
+
+    jobs_cache["data"] = jobs
+    jobs_cache["expires_at"] = now + CACHE_TTL_SECONDS
+
+    return jobs
+
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -42,23 +75,24 @@ def health():
 
 @app.get("/api/jobs")
 def get_jobs():
-    jobs = scrape_job_data(results_wanted=20)
+    jobs = get_cached_jobs()
 
-    return jobs[
-    [
-        "title",
-        "company",
-        "location",
-        "job_url",
-        "date_posted",
-        "description",
-    ]
-].fillna("").to_dict(orient="records")
+    job_records = jobs[
+        [
+            "title",
+            "company",
+            "location",
+            "job_url",
+            "date_posted",
+            "description",
+        ]
+    ].fillna("").to_dict(orient="records")
+
+    return job_records
 
 @app.get("/api/skills")
 def get_skills():
-
-    jobs = scrape_job_data(results_wanted=20)
+    jobs = get_cached_jobs()
 
     skill_counts = analyze_jobs(jobs)
 
@@ -73,7 +107,7 @@ def get_skills():
 
 @app.get("/api/locations")
 def get_locations():
-    jobs = scrape_job_data(results_wanted=20)
+    jobs = get_cached_jobs()
 
     locations = {}
 
@@ -99,7 +133,7 @@ def get_locations():
 @app.get("/api/location-skills")
 def get_location_skills():
 
-    jobs = scrape_job_data(results_wanted=20)
+    jobs = get_cached_jobs()
 
     location_skill_counts = {}
 
@@ -131,6 +165,16 @@ def get_location_skills():
 
 @app.get("/api/country-skills")
 def get_country_skills():
+    now = time.time()
+
+    if (
+        country_skills_cache["data"] is not None
+        and now < country_skills_cache["expires_at"]
+    ):
+        print("Cached_data")
+        return country_skills_cache["data"]
+
+    print("Raw_data")
 
     jobs = scrape_multiple_countries(
         results_per_country=20
@@ -154,5 +198,8 @@ def get_country_skills():
             for skill, count in skill_counts.items()
             if count > 0
         }
+
+    country_skills_cache["data"] = country_skill_counts
+    country_skills_cache["expires_at"] = now + CACHE_TTL_SECONDS
 
     return country_skill_counts
