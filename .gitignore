@@ -32,3 +32,9 @@ venv/
 __pycache__/
 *.pyc
 node_modules/
+# Generated Python files
+__pycache__/
+*.py[cod]
+
+# Accidental PowerShell redirection file
+$null
