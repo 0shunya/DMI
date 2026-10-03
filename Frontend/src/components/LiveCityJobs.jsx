@@ -43,7 +43,7 @@ function LiveCityJobs() {
     return (
       <section className="chart-card">
         <h2>Jobs by Region</h2>
-        <p>Loading live market data...</p>
+        <p>Loading stored job snapshot...</p>
       </section>
     );
   }

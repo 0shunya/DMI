@@ -1,166 +1,37 @@
 import { useState } from "react";
-
 import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
+  PolarAngleAxis,
+  PolarGrid,
+  PolarRadiusAxis,
+  Radar,
+  RadarChart,
   ResponsiveContainer,
+  Tooltip,
 } from "recharts";
 
-function CustomTooltip({ active, payload, label }) {
-  if (!active || !payload || !payload.length) {
-    return null;
-  }
-
-  return (
-    <div className="custom-tooltip">
-      <p>
-        <strong>{label}</strong>
-      </p>
-
-      <p>Jobs: {payload[0].value}</p>
-    </div>
-  );
+function CustomTooltip({ active, payload }) {
+  if (!active || !payload?.length) return null;
+  return <div className="custom-tooltip"><strong>{payload[0].payload.skill}</strong><span>{payload[0].value} job mentions</span></div>;
 }
 
-function CitySkillChart({ data }) {
+export default function CitySkillChart({ data }) {
   const [selectedRegion, setSelectedRegion] = useState("");
-
-  const activeRegion =
-  data.some((region) => region.location === selectedRegion)
-    ? selectedRegion
-    : data[0]?.location || "";
-
-
-  // Select the first region when live data arrives
-  // useEffect(() => {
-  //   if (data.length > 0) {
-  //     setSelectedRegion((currentRegion) => {
-  //       const exists = data.some(
-  //         (region) => region.location === currentRegion
-  //       );
-
-  //       return exists
-  //         ? currentRegion
-  //         : data[0].location;
-  //     });
-  //   }
-  // }, [data]);
-
-  // Find the selected region
-const cityData = data.find(
-  (region) => region.location === activeRegion
-);
-
-
-  if (!cityData) {
-    return (
-      <div className="chart-card">
-        <h2>Skills by Region</h2>
-        <p>No job snapshot available yet. Import jobs or load the labeled demo dataset.</p>
-      </div>
-    );
-  }
-
-  /*
-   * cityData looks like:
-   *
-   * {
-   *   location: "KA, IN",
-   *   Python: 2,
-   *   Java: 1,
-   *   JavaScript: 2,
-   *   React: 2
-   * }
-   *
-   * So remove "location" and turn
-   * everything else into chart data.
-   */
+  const activeRegion = data.some((region) => region.location === selectedRegion) ? selectedRegion : data[0]?.location || "";
+  const cityData = data.find((region) => region.location === activeRegion);
+  if (!cityData) return <div className="chart-card"><h2>Skills by region</h2><p>No job snapshot available yet. Import jobs or load the labeled demo dataset.</p></div>;
 
   const chartData = Object.entries(cityData)
     .filter(([key]) => key !== "location")
-    .map(([skill, jobs]) => ({
-      skill,
-      demand: Number(jobs) || 0,
-    }))
+    .map(([skill, jobs]) => ({ skill, demand: Number(jobs) || 0 }))
     .filter((item) => item.demand > 0)
-    .sort((a, b) => b.demand - a.demand);
-
+    .sort((a, b) => b.demand - a.demand)
+    .slice(0, 8);
   const topSkill = chartData[0];
 
-  return (
-    <div className="chart-card">
-      <h2>Skills by Region</h2>
-
-      <div className="city-selector">
-        <label htmlFor="region">
-          Select Region:
-        </label>
-
-        <select
-          id="region"
-          value={activeRegion}
-          onChange={(event) =>
-            setSelectedRegion(event.target.value)
-          }
-        >
-          {data.map((region) => (
-            <option
-              key={region.location}
-              value={region.location}
-            >
-              {region.location}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      {topSkill ? (
-        <p className="top-skill-city">
-          Most Needed Skill:{" "}
-          <strong>{topSkill.skill}</strong>{" "}
-          ({topSkill.demand})
-        </p>
-      ) : (
-        <p className="top-skill-city">
-          No skills detected for this region.
-        </p>
-      )}
-
-      {chartData.length > 0 ? (
-        <div className="chart-container">
-          <ResponsiveContainer width="100%" height={400}>
-            <BarChart data={chartData}>
-              <CartesianGrid strokeDasharray="2 3" />
-
-              <XAxis dataKey="skill" />
-
-              <YAxis
-                label={{
-                  value: "Jobs",
-                  angle: -90,
-                  position: "insideLeft",
-                }}
-              />
-
-              <Tooltip content={<CustomTooltip />} />
-
-              <Bar
-                dataKey="demand"
-                barSize={40}
-                fill="#FFA500"
-              />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      ) : (
-        <p>No skill data available for this region.</p>
-      )}
-    </div>
-  );
+  return <div className="chart-card">
+    <div className="chart-header"><h2>Skills by region</h2><span className="live-indicator">STORED SNAPSHOT</span></div>
+    <label className="chart-select">REGION<select value={activeRegion} onChange={(event) => setSelectedRegion(event.target.value)}>{data.map((region) => <option key={region.location} value={region.location}>{region.location}</option>)}</select></label>
+    {topSkill && <p className="chart-highlight">Leading signal: <strong>{topSkill.skill}</strong> <span>{topSkill.demand} mentions</span></p>}
+    {chartData.length ? <div className="chart-container radar-chart"><ResponsiveContainer width="100%" height={340}><RadarChart data={chartData} outerRadius="68%"><PolarGrid stroke="#d5cec0" /><PolarAngleAxis dataKey="skill" tick={{ fill: "#706b62", fontSize: 10 }} /><PolarRadiusAxis tick={{ fill: "#706b62", fontSize: 9 }} axisLine={false} /><Tooltip content={<CustomTooltip />} /><Radar dataKey="demand" stroke="#df4b2f" fill="#df4b2f" fillOpacity={0.18} strokeWidth={2} /></RadarChart></ResponsiveContainer></div> : <p>No skill data available for this region.</p>}
+  </div>;
 }
-
-export default CitySkillChart;
