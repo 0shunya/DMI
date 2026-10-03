@@ -6,6 +6,8 @@ const links = [
   ["/skills", "Skills"],
   ["/locations", "Places"],
   ["/compare", "Compare"],
+  ["/jobs", "Jobs"],
+  ["/applications", "Tracker"],
 ];
 
 function Navbar() {
@@ -33,7 +35,7 @@ function Navbar() {
         </nav>
 
         <div className="header-meta">
-          <span className="edition">EDITION 09.10.26</span>
+          <span className="edition">FIELD NOTES / 2026</span>
           <button className="menu-button" onClick={() => setMenuOpen(true)} aria-label="Open navigation">
             <span />
             <span />

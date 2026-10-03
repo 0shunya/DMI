@@ -60,7 +60,7 @@ const cityData = data.find(
     return (
       <div className="chart-card">
         <h2>Skills by Region</h2>
-        <p>Loading skill data...</p>
+        <p>No job snapshot available yet. Import jobs or load the labeled demo dataset.</p>
       </div>
     );
   }

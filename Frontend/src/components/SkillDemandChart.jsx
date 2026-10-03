@@ -28,8 +28,7 @@ function SkillDemandChart({ data }) {
   <h2>Most Demanded Skills</h2>
 
   <span className="live-indicator">
-    <span className="live-dot"></span>
-    LIVE
+    ILLUSTRATIVE SAMPLE
   </span>
 </div>
 

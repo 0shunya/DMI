@@ -38,3 +38,14 @@ __pycache__/
 
 # Accidental PowerShell redirection file
 $null
+
+# Local databases, environments, and secrets
+.venv/
+.env
+.env.*
+!.env.example
+*.db
+*.sqlite3
+.pytest_cache/
+.ruff_cache/
+.coverage

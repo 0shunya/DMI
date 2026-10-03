@@ -25,24 +25,24 @@ function Dashboard() {
     <>
       <Navbar />
       <main className="page-shell">
-        <div className="page-kicker"><span>01</span> MARKET BRIEFING <span className="kicker-rule" /> 10 SEPTEMBER 2026</div>
+        <div className="page-kicker"><span>01</span> MARKET BRIEFING <span className="kicker-rule" /> ILLUSTRATIVE EXAMPLE + STORED JOB SNAPSHOT</div>
         <section className="briefing-hero">
           <div>
             <p className="eyebrow">DEVELOPER MARKET INTELLIGENCE</p>
             <h1>Where developer opportunity is actually accumulating.</h1>
           </div>
           <div className="hero-copy">
-            <p>DMI tracks demand, salary, and location signals across the developer job market. We show the evidence, explain the calculation, and keep the limitations visible.</p>
-            <a className="text-link" href="#signal">Read the latest signal <span>↘</span></a>
+            <p>Explore an illustrative skill-and-salary briefing, then inspect a separately sourced job-board snapshot. The example numbers below are not live market measurements.</p>
+            <a className="text-link" href="/jobs">Explore the job snapshot <span>↗</span></a>
           </div>
         </section>
 
         <section className="signal-feature" id="signal">
-          <div className="feature-label"><span className="signal-dot" /> THIS WEEK&apos;S SIGNAL</div>
+          <div className="feature-label"><span className="signal-dot" /> ILLUSTRATIVE SKILL EXAMPLE · NOT LIVE DATA</div>
           <div className="signal-grid">
             <div className="signal-statement">
-              <h2>{bestOpportunity.skill} remains the strongest all-round opportunity in the current sample.</h2>
-              <p>It combines high demand with a competitive salary profile. That does not make it a guaranteed career choice; it makes it the clearest signal in this dataset.</p>
+              <h2>{bestOpportunity.skill} leads this example opportunity score.</h2>
+              <p>This demonstration combines sample demand and sample salary values. It does not describe the live labor market or predict hiring outcomes.</p>
             </div>
             <div className="signal-number">
               <strong>
@@ -91,7 +91,7 @@ function Dashboard() {
         </section>
 
         <section className="section-block">
-          <div className="section-heading"><div><span className="section-number">02</span><h2>The market at a glance</h2></div><p>Four numbers to orient yourself before the detail.</p></div>
+          <div className="section-heading"><div><span className="section-number">02</span><h2>Sample at a glance</h2></div><p>Illustrative figures, not measured from current listings.</p></div>
           <div className="glance-grid">
             
             {/* {stats.map((stat, index) => 
@@ -155,7 +155,7 @@ function Dashboard() {
         </section>
 
         <section className="section-block">
-          <div className="section-heading"><div><span className="section-number">03</span><h2>Skill market</h2></div><p>Demand is not the same thing as value. Read the two together.</p></div>
+          <div className="section-heading"><div><span className="section-number">03</span><h2>Sample skill view</h2></div><p>Example demand and salary values; not live statistics.</p></div>
           <div className="editorial-grid charts-grid">
             <div className="chart-wrap"><p className="chart-note">Python leads the current demand signal, while Go carries a smaller but higher-paying market.</p><SkillDemandChart data={skillSalary.map(({ skill, demand }) => ({ skill, demand }))} /></div>
             <div className="chart-wrap"><p className="chart-note">Average salary across the skills represented in the current sample.</p><SkillSalaryChart data={skillSalary} /></div>
@@ -163,12 +163,12 @@ function Dashboard() {
         </section>
 
         <section className="section-block">
-          <div className="section-heading"><div><span className="section-number">04</span><h2>Location market</h2></div><p>Place changes what a skill means in practice.</p></div>
+          <div className="section-heading"><div><span className="section-number">04</span><h2>Job snapshot by place</h2></div><p>Derived from stored listings; it may be empty until import succeeds.</p></div>
           <div className="editorial-grid charts-grid location-charts"><LiveCitySkill /><LiveCountrySkills /><LiveCityJobs /></div>
           {/* <LiveJobs /> */}
         </section>
 
-        <section className="method-note"><span className="eyebrow">A NOTE ON THE NUMBERS</span><p>This is a directional reading of the current dataset, not a prediction engine. Listing volume is a useful signal, but it is not the whole labor market.</p></section>
+        <section className="method-note"><span className="eyebrow">A NOTE ON THE NUMBERS</span><p>The first three sections are illustrative data; the location charts come from the stored job snapshot. Neither is a prediction of hiring outcomes. <a href="/jobs">Inspect the listings and their sources.</a></p></section>
       </main>
     </>
   );

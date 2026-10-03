@@ -22,6 +22,9 @@ function CustomTooltip({ active, payload, label }) {
 }
 
 function CityJobsChart({ data }) {
+  if (!data.length) {
+    return <div className="chart-card"><h2>Jobs by Region</h2><p>No job snapshot available yet. Import jobs or load the labeled demo dataset.</p></div>;
+  }
   return (
     <div className="chart-card">
       <h2>Jobs by Region</h2>
