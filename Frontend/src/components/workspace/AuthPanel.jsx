@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "../../context/auth.js";
+import { API_URL } from "../../config.js";
 
 export default function AuthPanel() {
   const { signIn, verifyEmail, resendVerification } = useAuth();
@@ -50,7 +51,7 @@ export default function AuthPanel() {
   };
 
   const startOAuth = (provider) => {
-    window.location.assign(`/api/auth/${provider}/start`);
+    window.location.assign(`${API_URL}/api/auth/${provider}/start`);
   };
 
   if (mode === "verify") return <section className="workspace-panel auth-panel" aria-label="Verify your email">
