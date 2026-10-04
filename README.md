@@ -2,7 +2,7 @@
 
 DMI is a full-stack developer job intelligence workspace. It separates **illustrative market analysis** from a **stored job snapshot**, then gives a candidate a private, human-controlled workflow to compare skills, save roles, and track applications.
 
-## Why this project is resume-ready
+## Engineering highlights
 
 - React/Vite frontend with an editorial, responsive UI
 - FastAPI backend with OpenAPI documentation at `/docs`
