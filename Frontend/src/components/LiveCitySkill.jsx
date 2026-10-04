@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
+import { API_URL } from "../config.js";
 
 import CitySkillChart from "./CitySkillChart";
 
-function LiveCitySkill() {
+function LiveCitySkill({ selectedCountry }) {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -10,19 +11,18 @@ function LiveCitySkill() {
   useEffect(() => {
     const fetchLocationSkills = async () => {
       try {
-        const response = await fetch(
-          "http://127.0.0.1:8000/api/location-skills"
-        );
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch location skill data");
-        }
-
-        const result = await response.json();
+        const [skillsResponse, locationsResponse] = await Promise.all([
+          fetch(`${API_URL}/api/location-skills`),
+          fetch(`${API_URL}/api/locations`),
+        ]);
+        if (!skillsResponse.ok || !locationsResponse.ok) throw new Error("Failed to fetch location skill data");
+        const [result, locationRows] = await Promise.all([skillsResponse.json(), locationsResponse.json()]);
+        const countryByLocation = new Map(locationRows.map((item) => [item.location, item.country]));
 
         const formattedData = Object.entries(result).map(
           ([location, skills]) => ({
             location,
+            country: countryByLocation.get(location) || "Not specified",
             ...skills,
           })
         );
@@ -43,7 +43,7 @@ function LiveCitySkill() {
     return (
       <section className="chart-card">
         <h2>Skills by Region</h2>
-        <p>Loading live market data...</p>
+        <p>Loading stored job snapshot...</p>
       </section>
     );
   }
@@ -57,7 +57,8 @@ function LiveCitySkill() {
     );
   }
 
-  return <CitySkillChart data={data} />;
+  const visibleData = selectedCountry ? data.filter((item) => item.country === selectedCountry) : data;
+  return <CitySkillChart data={visibleData} />;
 }
 
 export default LiveCitySkill;

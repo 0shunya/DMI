@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
+import { API_URL } from "../config.js";
 
 import CountrySkillChart from "./CountrySkillChart";
 
-function LiveCountrySkills() {
+function LiveCountrySkills({ selectedCountry, onCountryChange }) {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -11,7 +12,7 @@ function LiveCountrySkills() {
     const fetchCountrySkills = async () => {
       try {
         const response = await fetch(
-          "http://127.0.0.1:8000/api/country-skills"
+            `${API_URL}/api/country-skills`
         );
 
         if (!response.ok) {
@@ -43,7 +44,7 @@ function LiveCountrySkills() {
     return (
       <section className="chart-card">
         <h2>Skills by Country</h2>
-        <p>Loading live market data...</p>
+        <p>Loading stored job snapshot...</p>
       </section>
     );
   }
@@ -57,7 +58,7 @@ function LiveCountrySkills() {
     );
   }
 
-  return <CountrySkillChart data={data} />;
+  return <CountrySkillChart data={data} selectedCountry={selectedCountry} onCountryChange={onCountryChange} />;
 }
 
 export default LiveCountrySkills;

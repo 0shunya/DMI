@@ -1,147 +1,53 @@
-import { useState } from "react";
-
-import "../styles/locations.css";
-
-import LocationJobsChart from "../components/LocationJobsChart.jsx";
-import LocationSkillChart from "../components/LocationSkillChart.jsx";
-
+import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar.jsx";
-// import Handwriting from "../components/Handwriting";
+import CityJobsChart from "../components/CityJobsChart.jsx";
+import CitySkillChart from "../components/CitySkillChart.jsx";
+import { api } from "../api.js";
 
-import {
-  cityJobs,
-  citySkillDemand,
-} from "../data/dashboardData.jsx";
+export default function Locations() {
+  const [locations, setLocations] = useState([]);
+  const [countries, setCountries] = useState([]);
+  const [skills, setSkills] = useState({});
+  const [selectedCity, setSelectedCity] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-function Locations() {
-  const [selectedCity, setSelectedCity] = useState("Bengaluru");
+  useEffect(() => {
+    let active = true;
+    const load = async () => {
+      try {
+        const [locationRows, countryRows, locationSkills] = await Promise.all([api("/api/locations"), api("/api/countries"), api("/api/location-skills")]);
+        if (!active) return;
+        setLocations(locationRows.map((item) => ({ city: item.location, jobs: item.jobs })));
+        setCountries(countryRows.slice(0, 8).map((item) => ({ country: item.country, jobs: item.jobs, regions: item.regions })));
+        setSkills(locationSkills);
+        setSelectedCity(locationRows[0]?.location || "");
+      } catch (failure) {
+        if (active) setError(failure.message);
+      } finally {
+        if (active) setLoading(false);
+      }
+    };
+    load();
+    return () => { active = false; };
+  }, []);
 
-  const cityJobsData = cityJobs.find(
-    (item) => item.city === selectedCity
-  );
+  const citySkillRows = Object.entries(skills).map(([location, values]) => ({ location, ...values }));
+  const activeSkills = citySkillRows.find((row) => row.location === selectedCity);
+  const topSkill = activeSkills ? Object.entries(activeSkills).filter(([key]) => key !== "location").sort((a, b) => b[1] - a[1])[0] : null;
+  const activeJobs = locations.find((item) => item.city === selectedCity)?.jobs;
 
-  const citySkillData = citySkillDemand.find(
-    (item) => item.city === selectedCity
-  );
-
-  return (
-    <>
-      <Navbar />
-
-      <main>
-        <h1>Location Intelligence</h1>
-
-        <p>
-          Explore developer jobs and skill demand by city.
-        </p>
-
-        {/* City Selector */}
-
-        <section className="location-selector-card">
-          {/* <Handwriting fontSize="30px"> */}
-            Explore a City
-          {/* </Handwriting> */}
-
-          <label htmlFor="city">
-            Select City:
-          </label>
-
-          <select
-            id="city"
-            value={selectedCity}
-            onChange={(event) =>
-              setSelectedCity(event.target.value)
-            }
-          >
-            {cityJobs.map((item) => (
-              <option
-                key={item.city}
-                value={item.city}
-              >
-                {item.city}
-              </option>
-            ))}
-          </select>
-        </section>
-
-        {/* City Stats */}
-
-        <section className="location-stats">
-
-          <div className="location-stat-card">
-            <p>Developer Jobs</p>
-            <h2>{cityJobsData.jobs}</h2>
-          </div>
-
-          <div className="location-stat-card">
-            <p>Top Skill</p>
-            <h2>
-              {getTopSkill(citySkillData)}
-            </h2>
-          </div>
-
-          <div className="location-stat-card">
-            <p>Top Skill Demand</p>
-            <h2>
-              {getTopSkillDemand(citySkillData)}
-            </h2>
-          </div>
-
-        </section>
-
-        {/* City Overview */}
-
-        <section className="location-detail-card">
-          {/* <Handwriting fontSize="32px"> */}
-            {selectedCity}
-          {/* </Handwriting> */}
-
-          <p>
-            {selectedCity} has{" "}
-            <strong>{cityJobsData.jobs}</strong>{" "}
-            developer jobs in the current dataset.
-          </p>
-        </section>
-
-        <LocationJobsChart data={cityJobs} />
-        <LocationSkillChart city={citySkillData} />
-
-      </main>
-    </>
-  );
+  return <><Navbar /><main className="page-shell place-page">
+    <div className="page-kicker"><span>03</span> PLACE REPORT <span className="kicker-rule" /> STORED JOB SNAPSHOT</div>
+    <section className="profile-hero"><div><p className="eyebrow">EXPLORE THE STORED SNAPSHOT BY PLACE</p><h1>{selectedCity || "No data"}<em>.</em></h1><p className="lede">A dynamic regional view derived from persisted job records. Counts may be incomplete or delayed.</p></div>{locations.length > 0 && <label className="field-label" htmlFor="city">SELECT A REGION<select id="city" value={selectedCity} onChange={(event) => setSelectedCity(event.target.value)}>{locations.map((item) => <option key={item.city}>{item.city}</option>)}</select></label>}</section>
+    {error && <p className="form-error">Unable to load the stored location snapshot. {error}</p>}
+    {loading && <p className="muted">Loading stored job snapshot…</p>}
+    {!loading && !locations.length && <div className="workspace-empty"><h3>No location data yet.</h3><p>Run the ingestion worker or load the clearly labeled demo dataset.</p></div>}
+    {locations.length > 0 && <>
+      <section className="metric-strip">{[["STORED JOBS", activeJobs?.toLocaleString() || "—"], ["LEADING SKILL", topSkill?.[0] || "—"], ["SKILL MENTIONS", topSkill?.[1] || "—"]].map(([label, value]) => <div className="metric-cell" key={label}><span>{label}</span><strong>{value}</strong></div>)}</section>
+      <section className="profile-reading"><div><span className="section-number">10</span><h2>What stands out</h2></div><p><strong>{selectedCity}</strong> has <strong>{activeJobs?.toLocaleString() || 0}</strong> stored job records. <strong>{topSkill?.[0] || "No skill"}</strong> is the strongest extracted signal in this region.</p></section>
+      <section className="section-block"><div className="section-heading"><div><span className="section-number">11</span><h2>Country comparison</h2></div><p>Top countries from the current snapshot; hover to see every underlying region.</p></div><CityJobsChart data={countries} /></section>
+      <section className="section-block"><div className="section-heading"><div><span className="section-number">12</span><h2>Skill mix in {selectedCity}</h2></div><p>Known skills extracted from the selected region’s stored listings.</p></div><CitySkillChart data={citySkillRows} /></section>
+    </>}
+  </main></>;
 }
-
-
-/* Find highest-demand skill */
-
-function getTopSkill(city) {
-  const skills = [
-    { name: "Python", value: city.Python },
-    { name: "Java", value: city.Java },
-    { name: "JavaScript", value: city.JavaScript },
-    { name: "C#", value: city.CSharp },
-  ];
-
-  return skills.reduce(
-    (highest, current) =>
-      current.value > highest.value
-        ? current
-        : highest
-  ).name;
-}
-
-
-/* Find highest demand score */
-
-function getTopSkillDemand(city) {
-  const skills = [
-    city.Python,
-    city.Java,
-    city.JavaScript,
-    city.CSharp,
-  ];
-
-  return Math.max(...skills);
-}
-
-export default Locations;

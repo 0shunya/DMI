@@ -1,65 +1,34 @@
 import {
-  BarChart,
-  Bar,
+  CartesianGrid,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
 } from "recharts";
 
 function CustomTooltip({ active, payload, label }) {
-  if (!active || !payload || !payload.length) {
-    return null;
+  if (!active || !payload?.length) return null;
+  return <div className="custom-tooltip"><strong>{label}</strong><span>{payload[0].value} job mentions</span></div>;
+}
+
+export default function SkillDemandChart({ data }) {
+  if (!data.length) {
+    return <div className="chart-card"><h2>Skill demand</h2><p>No job snapshot available yet.</p></div>;
   }
-
-  return (
-    <div className="custom-tooltip">
-      <p><strong>{label}</strong></p>
-      <p>Jobs: {payload[0].value}</p>
+  return <div className="chart-card">
+    <div className="chart-header"><h2>Skill demand</h2><span className="live-indicator">STORED SNAPSHOT</span></div>
+    <div className="chart-container soft-chart">
+      <ResponsiveContainer width="100%" height={320}>
+        <LineChart data={data} margin={{ top: 16, right: 12, left: -12, bottom: 22 }}>
+          <CartesianGrid vertical={false} stroke="#d5cec0" strokeDasharray="2 8" />
+          <XAxis dataKey="skill" axisLine={false} tickLine={false} tick={{ fill: "#706b62", fontSize: 11 }} interval={0} height={36} />
+          <YAxis axisLine={false} tickLine={false} tick={{ fill: "#706b62", fontSize: 10 }} domain={[0, "dataMax + 4"]} allowDecimals={false} />
+          <Tooltip cursor={{ stroke: "#df4b2f", strokeDasharray: "3 5" }} content={<CustomTooltip />} />
+          <Line type="monotone" dataKey="demand" stroke="#df4b2f" strokeWidth={2.5} dot={{ r: 4, fill: "#f3f0e8", stroke: "#df4b2f", strokeWidth: 2 }} activeDot={{ r: 6, fill: "#df4b2f" }} />
+        </LineChart>
+      </ResponsiveContainer>
     </div>
-  );
+  </div>;
 }
-
-function SkillDemandChart({ data }) {
-  return (
-    <div className="chart-card">
-      <div className="chart-header">
-  <h2>Most Demanded Skills</h2>
-
-  <span className="live-indicator">
-    <span className="live-dot"></span>
-    LIVE
-  </span>
-</div>
-
-      <div className="chart-container">
-        <ResponsiveContainer width="100%" height={350}>
-          <BarChart data={data}>
-            <CartesianGrid strokeDasharray="5 2" />
-
-            <XAxis dataKey="skill" />
-
-            <YAxis
-              label={{
-                value: "Jobs Mentioning Skill",
-                angle: -90,
-                position: "insideLeft",
-              }}
-            />
-
-            <Tooltip content={<CustomTooltip />} />
-
-            <Bar
-              dataKey="demand"
-              barSize={40}
-              fill="#4F46E5"
-            />
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
-    </div>
-  );
-}
-
-export default SkillDemandChart;

@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { API_URL } from "../config.js";
+
 
 import CityJobsChart from "./CityJobsChart";
 
@@ -11,7 +13,7 @@ function LiveCityJobs() {
     const fetchLocations = async () => {
       try {
         const response = await fetch(
-          "http://127.0.0.1:8000/api/locations"
+            `${API_URL}/api/countries`
         );
 
         if (!response.ok) {
@@ -20,15 +22,16 @@ function LiveCityJobs() {
 
         const data = await response.json();
 
-        const formattedData = data.map((item) => ({
-          city: item.location,
+        const formattedData = data.slice(0, 8).map((item) => ({
+          country: item.country,
           jobs: item.jobs,
+          regions: item.regions,
         }));
 
         setLocations(formattedData);
       } catch (error) {
         console.error(error);
-        setError("Unable to load live location data.");
+        setError("Unable to load country snapshot data.");
       } finally {
         setLoading(false);
       }
@@ -40,8 +43,8 @@ function LiveCityJobs() {
   if (loading) {
     return (
       <section className="chart-card">
-        <h2>Jobs by Region</h2>
-        <p>Loading live market data...</p>
+        <h2>Jobs by Country</h2>
+        <p>Loading stored job snapshot...</p>
       </section>
     );
   }
@@ -49,7 +52,7 @@ function LiveCityJobs() {
   if (error) {
     return (
       <section className="chart-card">
-        <h2>Jobs by Region</h2>
+        <h2>Jobs by Country</h2>
         <p>{error}</p>
       </section>
     );

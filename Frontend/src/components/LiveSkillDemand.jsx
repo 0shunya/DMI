@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { API_URL } from "../config.js";
 
 import SkillDemandChart from "./SkillDemandChart";
 
@@ -11,7 +12,7 @@ function LiveSkillDemand() {
     const fetchSkills = async () => {
       try {
         const response = await fetch(
-          "http://127.0.0.1:8000/api/skills"
+            `${API_URL}/api/skills`
         );
 
         if (!response.ok) {
@@ -30,8 +31,6 @@ function LiveSkillDemand() {
         .slice(0, 10);
 
         setSkills(formattedData);
-
-        setSkills(formattedData);
       } catch (error) {
         console.error(error);
         setError("Unable to load live skill data.");
@@ -47,7 +46,7 @@ function LiveSkillDemand() {
     return (
       <section className="chart-card">
         <h2>Skill Demand</h2>
-        <p>Loading live market data...</p>
+        <p>Loading stored job snapshot...</p>
       </section>
     );
   }
