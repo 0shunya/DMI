@@ -21,7 +21,7 @@ export default function CitySkillChart({ data }) {
   if (!cityData) return <div className="chart-card"><h2>Skills by region</h2><p>No job snapshot available yet. Import jobs or load the labeled demo dataset.</p></div>;
 
   const chartData = Object.entries(cityData)
-    .filter(([key]) => key !== "location")
+    .filter(([key]) => key !== "location" && key !== "country")
     .map(([skill, jobs]) => ({ skill, demand: Number(jobs) || 0 }))
     .filter((item) => item.demand > 0)
     .sort((a, b) => b.demand - a.demand)

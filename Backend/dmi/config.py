@@ -14,6 +14,14 @@ class Settings(BaseSettings):
     scrape_interval_seconds: int = 21600
     ollama_url: str = ""
     ollama_model: str = "gemma3:1b"
+    frontend_url: str = "http://localhost:5173"
+    email_provider: str = "log"
+    resend_api_key: str = ""
+    email_from: str = "DMI <onboarding@resend.dev>"
+    google_client_id: str = ""
+    google_client_secret: str = ""
+    github_client_id: str = ""
+    github_client_secret: str = ""
 
     @property
     def origins(self) -> list[str]:

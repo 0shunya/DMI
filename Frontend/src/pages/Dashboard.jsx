@@ -7,19 +7,24 @@ import LiveCountrySkills from "../components/LiveCountrySkills.jsx";
 import { api } from "../api.js";
 
 function Dashboard() {
-  const [snapshot, setSnapshot] = useState({ status: null, skills: [], locations: [] });
+  const [snapshot, setSnapshot] = useState({ status: null, skills: [], locations: [], countries: [] });
   const [loading, setLoading] = useState(true);
+  const [selectedCountry, setSelectedCountry] = useState("");
 
   useEffect(() => {
     let active = true;
     const loadSnapshot = async () => {
       try {
-        const [status, skills, locations] = await Promise.all([
+        const [status, skills, locations, countries] = await Promise.all([
           api("/api/data-status"),
           api("/api/skills"),
           api("/api/locations"),
+          api("/api/countries"),
         ]);
-        if (active) setSnapshot({ status, skills, locations });
+        if (active) {
+          setSnapshot({ status, skills, locations, countries });
+          setSelectedCountry((current) => current || countries[0]?.country || "");
+        }
       } finally {
         if (active) setLoading(false);
       }
@@ -63,13 +68,13 @@ function Dashboard() {
       </section>
 
       <section className="section-block">
-        <div className="section-heading"><div><span className="section-number">03</span><h2>Stored skill signals</h2></div><p>Rounded lines show how often known skills appear across the persisted listings.</p></div>
-        <div className="editorial-grid charts-grid"><LiveSkillDemand /></div>
+        <div className="section-heading"><div><span className="section-number">03</span><h2>Stored signals</h2></div><p>Skill mentions and regional volume from the same persisted listings.</p></div>
+        <div className="editorial-grid charts-grid"><LiveSkillDemand /><LiveCityJobs /></div>
       </section>
 
       <section className="section-block">
-        <div className="section-heading"><div><span className="section-number">04</span><h2>Job snapshot by place</h2></div><p>Dynamic location and skill views from the stored job records.</p></div>
-        <div className="editorial-grid charts-grid location-charts"><LiveCitySkill /><LiveCountrySkills /><LiveCityJobs /></div>
+        <div className="section-heading"><div><span className="section-number">04</span><h2>Skill mix by place</h2></div><p>Dynamic regional and country skill views from the stored job records.</p></div>
+        <div className="editorial-grid charts-grid location-charts"><LiveCitySkill selectedCountry={selectedCountry} /><LiveCountrySkills selectedCountry={selectedCountry} onCountryChange={setSelectedCountry} /></div>
       </section>
 
       <section className="method-note"><span className="eyebrow">A NOTE ON THE NUMBERS</span><p>Last snapshot: {updatedAt}. DMI reports listing counts, not truth about the entire labor market. <a href="/jobs">Inspect the listings and their sources.</a></p></section>

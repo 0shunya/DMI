@@ -32,6 +32,19 @@ export function AuthProvider({ children }) {
       method: "POST",
       body: JSON.stringify({ email, password }),
     });
+    if (result.access_token) remember(result.access_token, result.user);
+    return result;
+  };
+
+  const verifyEmail = async (email, code) => {
+    const result = await api("/api/auth/verify-email", { method: "POST", body: JSON.stringify({ email, code }) });
+    remember(result.access_token, result.user);
+  };
+
+  const resendVerification = (email) => api("/api/auth/resend-verification", { method: "POST", body: JSON.stringify({ email }) });
+
+  const exchangeOAuthTicket = async (ticket) => {
+    const result = await api("/api/auth/oauth/exchange", { method: "POST", body: JSON.stringify({ ticket }) });
     remember(result.access_token, result.user);
   };
 
@@ -43,7 +56,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ token, user, signIn, logout, updateSkills }}>
+    <AuthContext.Provider value={{ token, user, signIn, verifyEmail, resendVerification, exchangeOAuthTicket, logout, updateSkills }}>
       {children}
     </AuthContext.Provider>
   );

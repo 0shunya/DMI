@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from hashlib import sha256
 
 from fastapi.testclient import TestClient
@@ -10,7 +11,7 @@ from sqlalchemy.pool import StaticPool
 from app import app
 from dmi.database import Base, get_db
 from dmi.ingestion import ingest_frame
-from dmi.models import Job
+from dmi.models import Job, User
 from skill_extractor import extract_skills
 
 
@@ -41,10 +42,15 @@ def add_job(session, url="https://example.com/jobs/1", title="Python Engineer", 
         return job.id
 
 
-def register(client, email="one@example.com"):
+def register(client, session, email="one@example.com"):
     result = client.post("/api/auth/register", json={"email": email, "password": "safe password 1234"})
     assert result.status_code == 201, result.text
-    return {"Authorization": f"Bearer {result.json()['access_token']}"}
+    with session() as db:
+        user = db.scalar(select(User).where(User.email == email))
+        user.email_verified_at = datetime.now(timezone.utc)
+        db.commit()
+    login = client.post("/api/auth/login", json={"email": email, "password": "safe password 1234"})
+    return {"Authorization": f"Bearer {login.json()['access_token']}"}
 
 
 def test_health_and_empty_state(context):
@@ -56,9 +62,22 @@ def test_health_and_empty_state(context):
     assert client.get("/api/applications").status_code == 401
 
 
-def test_registration_login_and_validation(context):
+def test_email_otp_verification(monkeypatch, context):
     client, _ = context
-    headers = register(client)
+    sent = {}
+    monkeypatch.setattr("app.send_verification_code", lambda email, code: sent.update(email=email, code=code))
+    created = client.post("/api/auth/register", json={"email": "verify@example.com", "password": "safe password 1234"})
+    assert created.status_code == 201
+    assert client.post("/api/auth/login", json={"email": "verify@example.com", "password": "safe password 1234"}).status_code == 403
+    verified = client.post("/api/auth/verify-email", json={"email": "verify@example.com", "code": sent["code"]})
+    assert verified.status_code == 200
+    assert verified.json()["user"]["email_verified"] is True
+    assert client.post("/api/auth/verify-email", json={"email": "verify@example.com", "code": sent["code"]}).status_code == 400
+
+
+def test_registration_login_and_validation(context):
+    client, session = context
+    headers = register(client, session)
     assert client.get("/api/me", headers=headers).json()["email"] == "one@example.com"
     assert client.post("/api/auth/login", json={"email": "one@example.com", "password": "safe password 1234"}).status_code == 200
     assert client.post("/api/auth/login", json={"email": "one@example.com", "password": "incorrect value"}).status_code == 401
@@ -70,8 +89,8 @@ def test_registration_login_and_validation(context):
 def test_tracking_is_per_user_and_match_explains_score(context):
     client, session = context
     job_id = add_job(session)
-    first = register(client)
-    other = register(client, "other@example.com")
+    first = register(client, session)
+    other = register(client, session, "other@example.com")
     assert client.patch("/api/me", json={"skills": ["Python", "Docker"]}, headers=first).status_code == 200
     match = client.get(f"/api/jobs/{job_id}/match", headers=first).json()
     assert match["score"] == 67
@@ -91,13 +110,14 @@ def test_tracking_is_per_user_and_match_explains_score(context):
     assert client.delete(f"/api/applications/{item_id}", headers=first).status_code == 204
 
 
-def test_cover_letter_requires_explicit_local_ai(context):
+def test_cover_letter_offline_fallback(context):
     client, session = context
     job_id = add_job(session)
-    headers = register(client)
+    headers = register(client, session)
     response = client.post(f"/api/jobs/{job_id}/draft-cover-letter", headers=headers)
-    assert response.status_code == 503
-    assert "OLLAMA_URL" in response.json()["detail"]
+    assert response.status_code == 200
+    assert response.json()["source"] == "offline structured draft"
+    assert "specific project" in response.json()["draft"]
 
 
 def test_analytics_and_query(context):
@@ -107,7 +127,8 @@ def test_analytics_and_query(context):
     assert len(client.get("/api/jobs", params={"q": "Python"}).json()) == 1
     assert len(client.get("/api/jobs", params={"country": "India"}).json()) == 2
     assert client.get("/api/jobs", params={"limit": 101}).status_code == 422
-    assert client.get("/api/locations").json() == [{"location": "Pune", "jobs": 2}]
+    assert client.get("/api/locations").json() == [{"location": "Pune, India", "country": "India", "jobs": 2}]
+    assert client.get("/api/countries").json() == [{"country": "India", "jobs": 2, "regions": ["Pune, India"]}]
     assert client.get("/api/country-skills").json()["India"]["C++"] == 1
     assert client.get("/api/data-status").json()["demo_count"] == 2
 

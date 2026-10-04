@@ -3,7 +3,7 @@ import { API_URL } from "../config.js";
 
 import CountrySkillChart from "./CountrySkillChart";
 
-function LiveCountrySkills() {
+function LiveCountrySkills({ selectedCountry, onCountryChange }) {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -58,7 +58,7 @@ function LiveCountrySkills() {
     );
   }
 
-  return <CountrySkillChart data={data} />;
+  return <CountrySkillChart data={data} selectedCountry={selectedCountry} onCountryChange={onCountryChange} />;
 }
 
 export default LiveCountrySkills;

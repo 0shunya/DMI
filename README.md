@@ -158,3 +158,53 @@ The default bind address is `127.0.0.1`, so the service is not accidentally expo
 ## License
 
 This repository is a portfolio project. Review the licenses and terms of all external data sources before operating a public scraper.
+
+## Authentication and email verification
+
+Password accounts must verify ownership of the email address before login. Registration sends a six-digit code that expires after 10 minutes and is limited to five attempts. The database stores only a hash of the code.
+
+For local development, leave `EMAIL_PROVIDER=log`; the code is written to the API log and no email service is needed. For real inbox delivery, Resend currently offers a free transactional tier of 3,000 emails per month with a 100-email daily limit. Brevo is another free option with 300 transactional sends per day. Set one provider in `.env`; never commit the API key.
+
+```env
+EMAIL_PROVIDER=resend
+RESEND_API_KEY=your-resend-api-key
+EMAIL_FROM=DMI <verified-sender@example.com>
+```
+
+An email syntax validator cannot prove that a person owns an address. DMI uses an OTP for ownership verification; provider-side email validation is not a substitute.
+
+### Google sign-in
+
+Create a Google Web application OAuth client and add this authorized redirect URI:
+
+```text
+http://localhost:8080/api/auth/google/callback
+```
+
+For a public deployment, add the HTTPS equivalent. Then set:
+
+```env
+GOOGLE_CLIENT_ID=...
+GOOGLE_CLIENT_SECRET=...
+```
+
+DMI requests only `openid email profile` and requires Google's verified-email claim.
+
+### GitHub sign-in
+
+Create a GitHub OAuth App under **Settings → Developer settings → OAuth Apps**. Set the callback URL to:
+
+```text
+http://localhost:8080/api/auth/github/callback
+```
+
+Then set:
+
+```env
+GITHUB_CLIENT_ID=...
+GITHUB_CLIENT_SECRET=...
+```
+
+DMI requests only `read:user user:email`, selects a verified GitHub email, and does not request repository access. If either provider is not configured, its button returns a clear configuration error rather than pretending sign-in is available.
+
+OAuth callback tickets are short-lived, single-use, and exchanged for the same DMI JWT session used by password accounts.

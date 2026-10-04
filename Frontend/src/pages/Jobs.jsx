@@ -10,6 +10,7 @@ const countries = ["", "India", "USA", "Canada", "UK", "Australia"];
 function JobCard({ job, token, saved, onSaved, hasSkills }) {
   const [match, setMatch] = useState(null);
   const [draft, setDraft] = useState("");
+  const [draftSource, setDraftSource] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
 
@@ -44,6 +45,7 @@ function JobCard({ job, token, saved, onSaved, hasSkills }) {
     try {
       const result = await api(`/api/jobs/${job.id}/draft-cover-letter`, { method: "POST", token });
       setDraft(result.draft);
+      setDraftSource(result.source || "local draft");
     } catch (failure) {
       setError(failure.message);
     } finally {
@@ -70,7 +72,7 @@ function JobCard({ job, token, saved, onSaved, hasSkills }) {
         <span>To explore: {match.missing.join(", ") || "None found"}</span>
         <small>{match.method}</small>
       </div>}
-      {draft && <div className="match-readout draft-readout" aria-live="polite"><strong>Draft for your review</strong><p>{draft}</p><small>Check every claim before using it. DMI does not submit applications.</small></div>}
+      {draft && <div className="match-readout draft-readout" aria-live="polite"><strong>Draft for your review</strong><p>{draft}</p><small>{draftSource}; check every claim before using it. DMI does not submit applications.</small></div>}
     </article>
   );
 }

@@ -8,7 +8,7 @@ from redis.exceptions import RedisError
 from .config import get_settings
 
 logger = logging.getLogger(__name__)
-CACHE_KEYS = ("analytics:skills", "analytics:locations", "analytics:location-skills", "analytics:country-skills")
+CACHE_KEYS = ("analytics:skills:v1", "analytics:locations:v2", "analytics:countries:v2", "analytics:location-skills:v2", "analytics:country-skills:v2")
 
 
 @lru_cache

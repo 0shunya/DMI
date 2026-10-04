@@ -1,4 +1,8 @@
-"""Optional local AI assistance. The feature stays disabled unless Ollama is configured."""
+"""Optional AI assistance with a useful offline fallback.
+
+When Ollama is configured, DMI asks it for a draft. Otherwise it creates a
+truthful structured starting point locally; neither path submits an application.
+"""
 import json
 from urllib import error, request
 
@@ -6,10 +10,26 @@ from .config import get_settings
 from .models import Job, User
 
 
-def draft_cover_letter(job: Job, user: User) -> str:
+def _offline_draft(job: Job, user: User) -> str:
+    skills = ", ".join(user.skills[:8]) if user.skills else "[relevant skills]"
+    return f"""Dear {job.company} hiring team,
+
+I am writing to express my interest in the {job.title} position at {job.company}. The role's location is listed as {job.location}.
+
+My current strengths include {skills}. I would welcome the opportunity to discuss how these skills could support your team and the work described in this listing. I am especially interested in learning more about the role's priorities and how I could contribute.
+
+Please replace this paragraph with one specific project or achievement that demonstrates your fit: [specific project or achievement].
+
+Thank you for your time and consideration. I would be glad to discuss the position further.
+
+Sincerely,
+[Your name]"""
+
+
+def draft_cover_letter(job: Job, user: User) -> tuple[str, str]:
     settings = get_settings()
     if not settings.ollama_url:
-        raise RuntimeError("Local AI is not configured. Set OLLAMA_URL to enable drafting.")
+        return _offline_draft(job, user), "offline structured draft"
 
     prompt = f"""Write a concise, honest cover-letter draft for a human to review.
 Do not invent experience, employers, achievements, or contact details.
@@ -37,4 +57,4 @@ Job description: {job.description[:6000]}
     draft = str(result.get("response", "")).strip()
     if not draft:
         raise RuntimeError("Local AI returned an empty draft.")
-    return draft[:6000]
+    return draft[:6000], "local Ollama draft"

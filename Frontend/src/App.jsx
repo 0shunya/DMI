@@ -6,6 +6,7 @@ import Locations from "./pages/Locations";
 import Compare from "./pages/Compare";
 import Jobs from "./pages/Jobs";
 import Applications from "./pages/Applications";
+import OAuthCallback from "./pages/OAuthCallback.jsx";
 import { AuthProvider } from "./context/AuthProvider.jsx";
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
         <Route path="/compare" element={<Compare />} />
         <Route path="/jobs" element={<Jobs />} />
         <Route path="/applications" element={<Applications />} />
+        <Route path="/auth/callback" element={<OAuthCallback />} />
       </Routes>
     </BrowserRouter></AuthProvider>
   );

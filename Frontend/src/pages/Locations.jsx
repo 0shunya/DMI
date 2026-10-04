@@ -6,6 +6,7 @@ import { api } from "../api.js";
 
 export default function Locations() {
   const [locations, setLocations] = useState([]);
+  const [countries, setCountries] = useState([]);
   const [skills, setSkills] = useState({});
   const [selectedCity, setSelectedCity] = useState("");
   const [loading, setLoading] = useState(true);
@@ -15,9 +16,10 @@ export default function Locations() {
     let active = true;
     const load = async () => {
       try {
-        const [locationRows, locationSkills] = await Promise.all([api("/api/locations"), api("/api/location-skills")]);
+        const [locationRows, countryRows, locationSkills] = await Promise.all([api("/api/locations"), api("/api/countries"), api("/api/location-skills")]);
         if (!active) return;
         setLocations(locationRows.map((item) => ({ city: item.location, jobs: item.jobs })));
+        setCountries(countryRows.slice(0, 8).map((item) => ({ country: item.country, jobs: item.jobs, regions: item.regions })));
         setSkills(locationSkills);
         setSelectedCity(locationRows[0]?.location || "");
       } catch (failure) {
@@ -44,7 +46,7 @@ export default function Locations() {
     {locations.length > 0 && <>
       <section className="metric-strip">{[["STORED JOBS", activeJobs?.toLocaleString() || "—"], ["LEADING SKILL", topSkill?.[0] || "—"], ["SKILL MENTIONS", topSkill?.[1] || "—"]].map(([label, value]) => <div className="metric-cell" key={label}><span>{label}</span><strong>{value}</strong></div>)}</section>
       <section className="profile-reading"><div><span className="section-number">10</span><h2>What stands out</h2></div><p><strong>{selectedCity}</strong> has <strong>{activeJobs?.toLocaleString() || 0}</strong> stored job records. <strong>{topSkill?.[0] || "No skill"}</strong> is the strongest extracted signal in this region.</p></section>
-      <section className="section-block"><div className="section-heading"><div><span className="section-number">11</span><h2>Region comparison</h2></div><p>Counts from the current persisted job snapshot.</p></div><CityJobsChart data={locations} /></section>
+      <section className="section-block"><div className="section-heading"><div><span className="section-number">11</span><h2>Country comparison</h2></div><p>Top countries from the current snapshot; hover to see every underlying region.</p></div><CityJobsChart data={countries} /></section>
       <section className="section-block"><div className="section-heading"><div><span className="section-number">12</span><h2>Skill mix in {selectedCity}</h2></div><p>Known skills extracted from the selected region’s stored listings.</p></div><CitySkillChart data={citySkillRows} /></section>
     </>}
   </main></>;
