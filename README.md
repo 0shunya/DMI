@@ -101,7 +101,7 @@ export OLLAMA_URL=http://127.0.0.1:11434
 export OLLAMA_MODEL=gemma3:1b
 ```
 
-The API calls Ollama's non-streaming `/api/generate` endpoint. Drafts are not stored automatically and are labeled as requiring human review. If `OLLAMA_URL` is absent, the endpoint returns a clear `503` rather than pretending AI is available.
+The API calls Ollama's non-streaming `/api/generate` endpoint. Drafts are not stored automatically and are labeled as requiring human review. If `OLLAMA_URL` is absent, the endpoint returns a truthful offline structured draft with placeholders.
 
 ## Docker deployment
 
@@ -208,3 +208,17 @@ GITHUB_CLIENT_SECRET=...
 DMI requests only `read:user user:email`, selects a verified GitHub email, and does not request repository access. If either provider is not configured, its button returns a clear configuration error rather than pretending sign-in is available.
 
 OAuth callback tickets are short-lived, single-use, and exchanged for the same DMI JWT session used by password accounts.
+
+## Scheduled production ingestion
+
+The public deployment uses a one-shot GitHub Actions job instead of an always-on worker. The workflow in `.github/workflows/ingest.yml` runs every six hours and can also be started manually from the Actions tab. It checks out `feature/resume-ready-dmi`, installs the backend dependencies, scrapes the configured countries, and writes the successful snapshot to Supabase. If a scrape returns no rows, the existing database snapshot is preserved.
+
+Before running it, add these repository Actions secrets in GitHub under **Settings → Secrets and variables → Actions**:
+
+| Secret | Value |
+| --- | --- |
+| `DATABASE_URL` | The private `postgresql+psycopg://...` Supabase session-pooler URL |
+| `SECRET_KEY` | The same strong production secret used by Render |
+| `REDIS_URL` | Optional Upstash Redis URL; leave the workflow secret empty if Redis is not configured |
+
+Never commit these values. Use **Actions → scheduled-ingestion → Run workflow** for the first manual refresh, then check `/api/data-status` on the deployed API.
