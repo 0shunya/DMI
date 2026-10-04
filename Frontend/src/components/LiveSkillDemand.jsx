@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { API_URL } from "../config.js";
+import { api } from "../api.js";
 
 import SkillDemandChart from "./SkillDemandChart";
 
@@ -11,15 +11,7 @@ function LiveSkillDemand() {
   useEffect(() => {
     const fetchSkills = async () => {
       try {
-        const response = await fetch(
-            `${API_URL}/api/skills`
-        );
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch skill data");
-        }
-
-        const data = await response.json();
+        const data = await api("/api/skills");
 
         const formattedData = data
         .map((item) => ({

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { API_URL } from "../config.js";
+import { api } from "../api.js";
 
 
 import CityJobsChart from "./CityJobsChart";
@@ -12,15 +12,7 @@ function LiveCityJobs() {
   useEffect(() => {
     const fetchLocations = async () => {
       try {
-        const response = await fetch(
-            `${API_URL}/api/countries`
-        );
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch location data");
-        }
-
-        const data = await response.json();
+        const data = await api("/api/countries");
 
         const formattedData = data.slice(0, 8).map((item) => ({
           country: item.country,

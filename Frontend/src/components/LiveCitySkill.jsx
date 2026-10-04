@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { API_URL } from "../config.js";
+import { api } from "../api.js";
 
 import CitySkillChart from "./CitySkillChart";
 
@@ -11,12 +11,10 @@ function LiveCitySkill({ selectedCountry }) {
   useEffect(() => {
     const fetchLocationSkills = async () => {
       try {
-        const [skillsResponse, locationsResponse] = await Promise.all([
-          fetch(`${API_URL}/api/location-skills`),
-          fetch(`${API_URL}/api/locations`),
+        const [result, locationRows] = await Promise.all([
+          api("/api/location-skills"),
+          api("/api/locations"),
         ]);
-        if (!skillsResponse.ok || !locationsResponse.ok) throw new Error("Failed to fetch location skill data");
-        const [result, locationRows] = await Promise.all([skillsResponse.json(), locationsResponse.json()]);
         const countryByLocation = new Map(locationRows.map((item) => [item.location, item.country]));
 
         const formattedData = Object.entries(result).map(

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { API_URL } from "../config.js";
+import { api } from "../api.js";
 
 import CountrySkillChart from "./CountrySkillChart";
 
@@ -11,15 +11,7 @@ function LiveCountrySkills({ selectedCountry, onCountryChange }) {
   useEffect(() => {
     const fetchCountrySkills = async () => {
       try {
-        const response = await fetch(
-            `${API_URL}/api/country-skills`
-        );
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch country skill data");
-        }
-
-        const result = await response.json();
+        const result = await api("/api/country-skills");
 
         const formattedData = Object.entries(result).map(
           ([country, skills]) => ({
