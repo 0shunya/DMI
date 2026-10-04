@@ -41,6 +41,9 @@ $null
 
 # Local databases, environments, and secrets
 .venv/
+.manus/
+.work/
+BackendNode/
 .env
 .env.*
 !.env.example
