@@ -99,14 +99,15 @@ export default function Jobs() {
     } catch { setSavedIds([]); }
   }, [token]);
 
-  const load = useCallback(async () => {
+  const load = useCallback(async ({ fresh = false } = {}) => {
     setLoading(true);
     setError("");
     try {
       const params = new URLSearchParams({ limit: "100" });
       if (filters.q) params.set("q", filters.q);
       if (filters.country) params.set("country", filters.country);
-      const [records, metadata] = await Promise.all([api(`/api/jobs?${params}`), api("/api/data-status")]);
+      const requestOptions = fresh ? { cache: "no-store" } : {};
+      const [records, metadata] = await Promise.all([api(`/api/jobs?${params}`, requestOptions), api("/api/data-status", requestOptions)]);
       setJobs(records);
       setStatus(metadata);
     } catch (failure) {
@@ -158,7 +159,7 @@ export default function Jobs() {
             <label>Country<select value={country} onChange={(event) => setCountry(event.target.value)}>{countries.map((item) => <option key={item} value={item}>{item || "All places"}</option>)}</select></label>
             <button className="action-button" type="submit">Search ↗</button>
           </form>
-          <div className="results-meta"><span>{loading ? "Loading…" : `${jobs.length} result${jobs.length === 1 ? "" : "s"}`}</span><button className="quiet-button" type="button" onClick={load} disabled={loading}>Refresh snapshot ↻</button></div>
+          <div className="results-meta"><span>{loading ? "Loading…" : `${jobs.length} result${jobs.length === 1 ? "" : "s"}`}</span><button className="quiet-button" type="button" onClick={() => load({ fresh: true })} disabled={loading}>Refresh snapshot ↻</button></div>
           {error && <p role="alert" className="form-error">{error}</p>}
           {!loading && !error && jobs.length === 0 && <div className="workspace-empty"><h3>No listings in this view.</h3><p>Try a broader search. If the database is new, wait for the worker or use the clearly labeled demo dataset in the README.</p></div>}
           <div className="job-list">{jobs.map((job) => <JobCard key={job.id} job={job} token={token} saved={savedIds.includes(job.id)} onSaved={refreshSaved} hasSkills={Boolean(user?.skills?.length)} />)}</div>
