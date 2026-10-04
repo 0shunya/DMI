@@ -2,6 +2,20 @@ import { useState } from "react";
 import { useAuth } from "../../context/auth.js";
 import { API_URL } from "../../config.js";
 
+function passwordStrength(value) {
+  const checks = [
+    { label: "12+ characters", valid: value.length >= 12 },
+    { label: "Uppercase letter", valid: /[A-Z]/.test(value) },
+    { label: "Lowercase letter", valid: /[a-z]/.test(value) },
+    { label: "Number", valid: /\d/.test(value) },
+    { label: "Special character", valid: /[^A-Za-z\d]/.test(value) },
+  ];
+  const score = checks.filter((check) => check.valid).length;
+  const label = score <= 1 ? "Weak" : score <= 3 ? "Fair" : score === 4 ? "Good" : "Strong";
+  const level = score <= 1 ? "weak" : score <= 3 ? "fair" : score === 4 ? "good" : "strong";
+  return { checks, score, label, level };
+}
+
 export default function AuthPanel() {
   const { signIn, verifyEmail, resendVerification } = useAuth();
   const [mode, setMode] = useState("login");
@@ -10,6 +24,8 @@ export default function AuthPanel() {
   const [code, setCode] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const strength = passwordStrength(password);
 
   const submit = async (event) => {
     event.preventDefault();
@@ -75,7 +91,19 @@ export default function AuthPanel() {
       <div className="auth-divider"><span>or use email</span></div>
       <form onSubmit={submit} className="workspace-form">
         <label>Email<input type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} /></label>
-        <label>Password<input type="password" minLength={12} maxLength={128} autoComplete={mode === "register" ? "new-password" : "current-password"} required value={password} onChange={(e) => setPassword(e.target.value)} /></label>
+        <label>Password
+          <span className="password-field">
+            <input type={showPassword ? "text" : "password"} minLength={12} maxLength={128} autoComplete={mode === "register" ? "new-password" : "current-password"} required value={password} onChange={(e) => setPassword(e.target.value)} />
+            <button type="button" className="password-toggle" onClick={() => setShowPassword((visible) => !visible)} aria-label={showPassword ? "Hide password" : "Show password"} aria-pressed={showPassword}>{showPassword ? "Hide" : "Show"}</button>
+          </span>
+        </label>
+        {mode === "register" && <div className={`password-meter password-meter-${strength.level}`} aria-live="polite">
+          <div className="password-meter-heading"><span>Password strength</span><strong>{password ? strength.label : "Start typing"}</strong></div>
+          <div className="password-meter-bars" aria-label={`Password strength: ${password ? strength.label : "not set"}`}>
+            {Array.from({ length: 5 }, (_, index) => <span key={index} className={index < strength.score ? "filled" : ""} />)}
+          </div>
+          <ul>{strength.checks.map((check) => <li key={check.label} className={check.valid ? "met" : ""}>{check.valid ? "✓" : "○"} {check.label}</li>)}</ul>
+        </div>}
         {error && <p role="alert" className="form-error">{error}</p>}
         <button className="action-button" type="submit" disabled={busy}>{busy ? "Working…" : mode === "register" ? "Create account" : "Sign in"} <span aria-hidden="true">↗</span></button>
       </form>
