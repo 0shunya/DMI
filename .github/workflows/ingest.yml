@@ -16,7 +16,7 @@ jobs:
       - name: Check out deployment branch
         uses: actions/checkout@v4
         with:
-          ref: feature/resume-ready-dmi
+          ref: main
 
       - name: Set up Python
         uses: actions/setup-python@v5
