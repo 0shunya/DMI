@@ -11,7 +11,7 @@ from fastapi import Depends, FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 from pydantic import BaseModel, EmailStr, Field
-from sqlalchemy import func, or_, select, text
+from sqlalchemy import func, or_, select, text, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
@@ -359,10 +359,14 @@ def oauth_callback(provider: Literal["google", "github"], request: Request, code
 @app.post("/api/auth/oauth/exchange")
 def oauth_exchange(payload: OAuthExchange, db: Session = Depends(get_db)):
     now = datetime.now(timezone.utc)
-    ticket = db.scalar(select(OAuthTicket).where(OAuthTicket.token_hash == hashlib.sha256(payload.ticket.encode()).hexdigest(), OAuthTicket.used_at.is_(None)).with_for_update())
-    if ticket is None or ticket.expires_at < now:
+    token_hash = hashlib.sha256(payload.ticket.encode()).hexdigest()
+    ticket = db.scalar(select(OAuthTicket).where(OAuthTicket.token_hash == token_hash))
+    if ticket is None:
         raise HTTPException(status_code=400, detail="Invalid or expired OAuth ticket")
-    ticket.used_at = now
+    redeemed = db.execute(update(OAuthTicket).where(OAuthTicket.id == ticket.id, OAuthTicket.used_at.is_(None), OAuthTicket.expires_at >= now).values(used_at=now))
+    if redeemed.rowcount != 1:
+        db.rollback()
+        raise HTTPException(status_code=400, detail="Invalid or expired OAuth ticket")
     user = db.get(User, ticket.user_id)
     db.commit()
     if user is None:
