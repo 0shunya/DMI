@@ -1,6 +1,6 @@
 import { API_URL } from "./config.js";
 
-const CACHE_VERSION = "v2";
+const CACHE_VERSION = "v3";
 const CACHE_TTL_MS = 5 * 60 * 1000;
 const CACHE_PREFIX = `dmi-api-${CACHE_VERSION}:`;
 const memoryCache = new Map();
