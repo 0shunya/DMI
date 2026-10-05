@@ -8,11 +8,24 @@ import {
   YAxis,
 } from "recharts";
 
+function compactRegions(regions = []) {
+  const counts = new Map();
+  regions.forEach((region) => {
+    const parts = region.split(",").map((part) => part.trim()).filter(Boolean);
+    const group = parts.at(-1) || "Not specified";
+    counts.set(group, (counts.get(group) || 0) + 1);
+  });
+  return [...counts.entries()]
+    .sort((left, right) => right[1] - left[1] || left[0].localeCompare(right[0]))
+    .map(([name, count]) => count > 1 ? `${name} (${count})` : name)
+    .join(", ");
+}
+
 function CustomTooltip({ active, payload, label }) {
   if (!active || !payload?.length) return null;
   const row = payload[0].payload;
-  const detail = row.regions?.join(", ") || row.city || "Not specified";
-  return <div className="custom-tooltip"><strong>{label}</strong><span>{row.jobs} stored jobs</span><span>{row.regions ? "Regions" : "Location"}: {detail}</span></div>;
+  const detail = row.regions ? compactRegions(row.regions) : row.city || "Not specified";
+  return <div className="custom-tooltip"><strong>{label}</strong><span>{row.jobs} stored jobs</span><span>{row.regions ? `${row.regions.length} locations grouped by region` : "Location"}: {detail}</span></div>;
 }
 
 export default function CityJobsChart({ data }) {
