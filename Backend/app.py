@@ -4,6 +4,7 @@ from datetime import datetime, timedelta, timezone
 import hashlib
 import hmac
 import secrets
+import time
 from typing import Literal
 
 from fastapi import Depends, FastAPI, HTTPException, Query, Request
@@ -126,24 +127,28 @@ def profile_record(user: User) -> dict:
 
 
 def oauth_redirect_uri(request: Request, provider: str) -> str:
-    scheme = request.headers.get("x-forwarded-proto", request.url.scheme).split(",")[0].strip()
-    host = request.headers.get("x-forwarded-host", request.headers.get("host", "localhost:8000"))
-    return f"{scheme}://{host}/api/auth/{provider}/callback"
+    base_url = get_settings().oauth_backend_url.rstrip("/")
+    if not base_url:
+        base_url = str(request.base_url).rstrip("/")
+    return f"{base_url}/api/auth/{provider}/callback"
 
 
 def make_oauth_state(provider: str) -> str:
     nonce = secrets.token_urlsafe(24)
-    signature = hmac.new(get_settings().secret_key.encode(), f"{provider}:{nonce}".encode(), hashlib.sha256).hexdigest()
-    return f"{provider}.{nonce}.{signature}"
+    issued_at = str(int(time.time()))
+    payload = f"{provider}:{issued_at}:{nonce}"
+    signature = hmac.new(get_settings().secret_key.encode(), payload.encode(), hashlib.sha256).hexdigest()
+    return f"{provider}.{issued_at}.{nonce}.{signature}"
 
 
 def valid_oauth_state(state: str, provider: str) -> bool:
     try:
-        state_provider, nonce, signature = state.split(".", 2)
+        state_provider, issued_at, nonce, signature = state.split(".", 3)
+        age = time.time() - int(issued_at)
     except ValueError:
         return False
-    expected = hmac.new(get_settings().secret_key.encode(), f"{provider}:{nonce}".encode(), hashlib.sha256).hexdigest()
-    return state_provider == provider and hmac.compare_digest(signature, expected)
+    expected = hmac.new(get_settings().secret_key.encode(), f"{provider}:{issued_at}:{nonce}".encode(), hashlib.sha256).hexdigest()
+    return state_provider == provider and -60 <= age <= 600 and hmac.compare_digest(signature, expected)
 
 
 @app.get("/")
@@ -309,15 +314,19 @@ def oauth_start(provider: Literal["google", "github"], request: Request):
     if not configured(provider):
         raise HTTPException(status_code=503, detail=f"{provider.title()} sign-in is not configured")
     try:
-        url = authorization_url(provider, make_oauth_state(provider), oauth_redirect_uri(request, provider))
+        state = make_oauth_state(provider)
+        url = authorization_url(provider, state, oauth_redirect_uri(request, provider))
     except OAuthProviderError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
-    return RedirectResponse(url, status_code=302)
+    response = RedirectResponse(url, status_code=302)
+    response.set_cookie("dmi_oauth_state", state, max_age=600, httponly=True, secure=settings.environment == "production", samesite="lax", path="/api/auth")
+    return response
 
 
 @app.get("/api/auth/{provider}/callback")
 def oauth_callback(provider: Literal["google", "github"], request: Request, code: str = "", state: str = "", db: Session = Depends(get_db)):
-    if not code or not valid_oauth_state(state, provider):
+    state_cookie = request.cookies.get("dmi_oauth_state", "")
+    if not code or not hmac.compare_digest(state, state_cookie) or not valid_oauth_state(state, provider):
         raise HTTPException(status_code=400, detail="Invalid OAuth callback")
     try:
         subject, email = exchange_code(provider, code, oauth_redirect_uri(request, provider))
@@ -330,6 +339,8 @@ def oauth_callback(provider: Literal["google", "github"], request: Request, code
         user = User(email=email, password_hash=None, skills=[], email_verified_at=datetime.now(timezone.utc))
         db.add(user)
         db.flush()
+    elif identity is None and user.password_hash is not None:
+        raise HTTPException(status_code=409, detail="An account already uses this email. Sign in with email first, then link OAuth from your account.")
     elif user.email_verified_at is None:
         user.email_verified_at = datetime.now(timezone.utc)
     if identity is None:
@@ -340,13 +351,15 @@ def oauth_callback(provider: Literal["google", "github"], request: Request, code
     db.add(OAuthTicket(token_hash=hashlib.sha256(raw_ticket.encode()).hexdigest(), user_id=user.id, expires_at=datetime.now(timezone.utc) + timedelta(minutes=2)))
     db.commit()
     destination = f"{get_settings().frontend_url.rstrip('/')}/auth/callback?ticket={raw_ticket}"
-    return RedirectResponse(destination, status_code=302)
+    response = RedirectResponse(destination, status_code=302)
+    response.delete_cookie("dmi_oauth_state", path="/api/auth")
+    return response
 
 
 @app.post("/api/auth/oauth/exchange")
 def oauth_exchange(payload: OAuthExchange, db: Session = Depends(get_db)):
     now = datetime.now(timezone.utc)
-    ticket = db.scalar(select(OAuthTicket).where(OAuthTicket.token_hash == hashlib.sha256(payload.ticket.encode()).hexdigest(), OAuthTicket.used_at.is_(None)))
+    ticket = db.scalar(select(OAuthTicket).where(OAuthTicket.token_hash == hashlib.sha256(payload.ticket.encode()).hexdigest(), OAuthTicket.used_at.is_(None)).with_for_update())
     if ticket is None or ticket.expires_at < now:
         raise HTTPException(status_code=400, detail="Invalid or expired OAuth ticket")
     ticket.used_at = now

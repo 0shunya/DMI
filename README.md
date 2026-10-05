@@ -181,7 +181,7 @@ Create a Google Web application OAuth client and add this authorized redirect UR
 http://localhost:8080/api/auth/google/callback
 ```
 
-For a public deployment, add the HTTPS equivalent. Then set:
+For a public deployment, add the HTTPS equivalent. Set `OAUTH_BACKEND_URL` to the public API origin (for example `https://dmi-api.example.com`) so callback URLs do not depend on forwarded host headers. Then set:
 
 ```env
 GOOGLE_CLIENT_ID=...
@@ -189,6 +189,7 @@ GOOGLE_CLIENT_SECRET=...
 ```
 
 DMI requests only `openid email profile` and requires Google's verified-email claim.
+OAuth will not silently attach a provider to an existing password account with the same email; sign in with email first before any future account-linking flow.
 
 ### GitHub sign-in
 

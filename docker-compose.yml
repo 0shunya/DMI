@@ -6,6 +6,7 @@ x-app-environment: &app-environment
   CORS_ORIGINS: http://localhost:8080
   SCRAPE_INTERVAL_SECONDS: ${SCRAPE_INTERVAL_SECONDS:-21600}
   FRONTEND_URL: ${FRONTEND_URL:-http://localhost:8080}
+  OAUTH_BACKEND_URL: ${OAUTH_BACKEND_URL:-http://localhost:8080}
   EMAIL_PROVIDER: ${EMAIL_PROVIDER:-log}
   RESEND_API_KEY: ${RESEND_API_KEY:-}
   EMAIL_FROM: ${EMAIL_FROM:-DMI <onboarding@resend.dev>}

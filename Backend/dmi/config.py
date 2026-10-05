@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     ollama_url: str = ""
     ollama_model: str = "gemma3:1b"
     frontend_url: str = "http://localhost:5173"
+    oauth_backend_url: str = ""
     email_provider: str = "log"
     resend_api_key: str = ""
     email_from: str = "DMI <onboarding@resend.dev>"

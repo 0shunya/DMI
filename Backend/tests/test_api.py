@@ -1,5 +1,6 @@
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from hashlib import sha256
+import secrets
 
 from fastapi.testclient import TestClient
 import pandas as pd
@@ -8,10 +9,10 @@ from sqlalchemy import create_engine, select
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import StaticPool
 
-from app import app
+from app import app, make_oauth_state, valid_oauth_state
 from dmi.database import Base, get_db
 from dmi.ingestion import ingest_frame
-from dmi.models import Job, User
+from dmi.models import Job, OAuthTicket, User
 from skill_extractor import extract_skills
 
 
@@ -73,6 +74,38 @@ def test_email_otp_verification(monkeypatch, context):
     assert verified.status_code == 200
     assert verified.json()["user"]["email_verified"] is True
     assert client.post("/api/auth/verify-email", json={"email": "verify@example.com", "code": sent["code"]}).status_code == 400
+
+
+def test_oauth_state_is_signed_and_provider_bound():
+    state = make_oauth_state("google")
+    assert valid_oauth_state(state, "google") is True
+    assert valid_oauth_state(state, "github") is False
+    assert valid_oauth_state(f"{state}x", "google") is False
+
+
+def test_oauth_does_not_silently_link_password_account(monkeypatch, context):
+    client, session = context
+    register(client, session, "linked@example.com")
+    state = make_oauth_state("google")
+    client.cookies.set("dmi_oauth_state", state)
+    monkeypatch.setattr("app.exchange_code", lambda provider, code, redirect_uri: ("google-subject", "linked@example.com"))
+    response = client.get(f"/api/auth/google/callback?code=provider-code&state={state}", follow_redirects=False)
+    assert response.status_code == 409
+
+
+def test_oauth_ticket_is_single_use(context):
+    client, session = context
+    raw_ticket = secrets.token_urlsafe(32)
+    with session() as db:
+        user = User(email="oauth@example.com", password_hash=None, skills=[], email_verified_at=datetime.now(timezone.utc))
+        db.add(user)
+        db.flush()
+        db.add(OAuthTicket(token_hash=sha256(raw_ticket.encode()).hexdigest(), user_id=user.id, expires_at=datetime.now(timezone.utc) + timedelta(minutes=2)))
+        db.commit()
+    first = client.post("/api/auth/oauth/exchange", json={"ticket": raw_ticket})
+    second = client.post("/api/auth/oauth/exchange", json={"ticket": raw_ticket})
+    assert first.status_code == 200
+    assert second.status_code == 400
 
 
 def test_registration_login_and_validation(context):
