@@ -1,0 +1,14 @@
+name: keep-api-warm
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "*/10 * * * *"
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Ping production API
+        run: curl --fail --silent --show-error --max-time 20 https://dmi-api-up0g.onrender.com/health

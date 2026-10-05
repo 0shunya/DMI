@@ -214,6 +214,8 @@ OAuth callback tickets are short-lived, single-use, and exchanged for the same D
 
 The public deployment uses a one-shot GitHub Actions job instead of an always-on worker. The workflow in `.github/workflows/ingest.yml` runs every six hours and can also be started manually from the Actions tab. It checks out `main`, installs the backend dependencies, scrapes the configured countries, and writes the successful snapshot to Supabase. If a scrape returns no rows, the existing database snapshot is preserved.
 
+The `.github/workflows/keepalive.yml` workflow pings the production health endpoint every ten minutes to reduce cold starts on Render's free tier. Free Render services can still sleep or wake slowly occasionally; a paid always-on instance is required for a guaranteed sub-five-second first request.
+
 Before running it, add these repository Actions secrets in GitHub under **Settings → Secrets and variables → Actions**:
 
 | Secret | Value |
