@@ -74,6 +74,13 @@ def display_location(location: str | None, country: str | None) -> str:
     return ", ".join([*parts, full_country])
 
 
+def display_region(location: str | None, country: str | None) -> str:
+    full_location = display_location(location, country)
+    full_country = display_country(country)
+    suffix = f", {full_country}"
+    return full_location[:-len(suffix)] if full_location.endswith(suffix) else full_location
+
+
 class Credentials(BaseModel):
     email: EmailStr
     password: str = Field(min_length=12, max_length=128)
@@ -223,12 +230,12 @@ def get_countries(db: Session = Depends(get_db)):
             record = grouped.setdefault(country, {"jobs": 0, "regions": set()})
             record["jobs"] = int(record["jobs"]) + 1
             if job.location != "Not specified":
-                record["regions"].add(display_location(job.location, job.country))
+                record["regions"].add(display_region(job.location, job.country))
         return [
             {"country": display_country(country), "jobs": int(record["jobs"]), "regions": sorted(record["regions"])}
             for country, record in sorted(grouped.items(), key=lambda item: (-int(item[1]["jobs"]), item[0]))
         ]
-    return cached("analytics:countries:v2", produce)
+    return cached("analytics:countries:v3", produce)
 
 
 @app.get("/api/location-skills")

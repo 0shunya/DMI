@@ -44,6 +44,7 @@ $null
 .manus/
 .work/
 BackendNode/
+brag-output/
 .env
 .env.*
 !.env.example

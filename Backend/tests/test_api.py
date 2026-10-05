@@ -161,7 +161,7 @@ def test_analytics_and_query(context):
     assert len(client.get("/api/jobs", params={"country": "India"}).json()) == 2
     assert client.get("/api/jobs", params={"limit": 101}).status_code == 422
     assert client.get("/api/locations").json() == [{"location": "Pune, India", "country": "India", "jobs": 2}]
-    assert client.get("/api/countries").json() == [{"country": "India", "jobs": 2, "regions": ["Pune, India"]}]
+    assert client.get("/api/countries").json() == [{"country": "India", "jobs": 2, "regions": ["Pune"]}]
     assert client.get("/api/country-skills").json()["India"]["C++"] == 1
     assert client.get("/api/data-status").json()["demo_count"] == 2
 
