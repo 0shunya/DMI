@@ -16,7 +16,8 @@ export default function Locations() {
     let active = true;
     const load = async () => {
       try {
-        const [locationRows, countryRows, locationSkills] = await Promise.all([api("/api/locations"), api("/api/countries"), api("/api/location-skills")]);
+        const snapshot = await api("/api/dashboard-snapshot");
+        const { locations: locationRows, countries: countryRows, location_skills: locationSkills } = snapshot;
         if (!active) return;
         setLocations(locationRows.map((item) => ({ city: item.location, jobs: item.jobs })));
         setCountries(countryRows.slice(0, 8).map((item) => ({ country: item.country, jobs: item.jobs, regions: item.regions })));

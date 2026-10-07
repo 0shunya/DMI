@@ -211,7 +211,7 @@ DMI requests only `read:user user:email`, selects a verified GitHub email, and d
 
 OAuth callback tickets are short-lived, single-use, and exchanged for the same DMI JWT session used by password accounts.
 
-The dashboard uses `/api/dashboard-snapshot` so its analytics load in one request from the active PostgreSQL snapshot row. Ingestion builds a new version and switches it active only after the complete payload is ready, so every user reads the same last-completed snapshot. The browser does not persist this dashboard data.
+The dashboard and Places page use `/api/dashboard-snapshot`, reading one complete payload from the active PostgreSQL snapshot row on the first request. Ingestion builds a new version and switches it active only after the complete payload is ready, so every user reads the same last-completed snapshot. After a successful request, the frontend keeps a five-minute session-scoped copy for fast navigation; authenticated responses are keyed to that user session and are cleared after mutations.
 
 ## Scheduled production ingestion
 

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { api } from "../api.js";
+import { api, clearSessionCache } from "../api.js";
 import { AuthContext } from "./auth.js";
 
 export function AuthProvider({ children }) {
@@ -9,6 +9,7 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     if (!token) return;
     api("/api/me", { token }).then(setUser).catch(() => {
+      clearSessionCache(token);
       sessionStorage.removeItem("dmi_session");
       setToken("");
       setUser(null);
@@ -22,6 +23,7 @@ export function AuthProvider({ children }) {
   };
 
   const logout = () => {
+    clearSessionCache(token);
     sessionStorage.removeItem("dmi_session");
     setToken("");
     setUser(null);
