@@ -1,60 +1,6 @@
 import { API_URL } from "./config.js";
 
-const CACHE_VERSION = "v4";
-const CACHE_TTL_MS = 5 * 60 * 1000;
-const CACHE_PREFIX = `dmi-api-${CACHE_VERSION}:`;
-const memoryCache = new Map();
-
-function cacheKey(path) {
-  return `${CACHE_PREFIX}${API_URL}${path}`;
-}
-
-function readCache(key, allowStale = false) {
-  const now = Date.now();
-  const memoryEntry = memoryCache.get(key);
-  if (memoryEntry && (memoryEntry.expiresAt > now || allowStale)) {
-    return { hit: true, stale: memoryEntry.expiresAt <= now, data: memoryEntry.data };
-  }
-  memoryCache.delete(key);
-
-  try {
-    const stored = sessionStorage.getItem(key);
-    if (!stored) return { hit: false };
-    const entry = JSON.parse(stored);
-    if (entry.expiresAt > now || allowStale) {
-      memoryCache.set(key, entry);
-      return { hit: true, stale: entry.expiresAt <= now, data: entry.data };
-    }
-    sessionStorage.removeItem(key);
-  } catch {
-    // Private browsing or a full session store should never break API requests.
-  }
-  return { hit: false };
-}
-
-function writeCache(key, data) {
-  const entry = { data, expiresAt: Date.now() + CACHE_TTL_MS };
-  memoryCache.set(key, entry);
-  try {
-    sessionStorage.setItem(key, JSON.stringify(entry));
-  } catch {
-    // Keep the in-memory cache when sessionStorage is unavailable or full.
-  }
-}
-
-function clearCache() {
-  memoryCache.clear();
-  try {
-    Object.keys(sessionStorage).filter((key) => key.startsWith(CACHE_PREFIX)).forEach((key) => sessionStorage.removeItem(key));
-  } catch {
-    // Cache invalidation is best effort.
-  }
-}
-
-async function requestApi(path, { token, onFresh, ...options } = {}) {
-  const method = (options.method || "GET").toUpperCase();
-  const cacheable = method === "GET" && !token && options.cache !== "no-store";
-  const key = cacheKey(path);
+export async function api(path, { token, ...options } = {}) {
   const response = await fetch(`${API_URL}${path}`, {
     ...options,
     headers: {
@@ -63,32 +9,11 @@ async function requestApi(path, { token, onFresh, ...options } = {}) {
       ...options.headers,
     },
   });
-  if (response.status === 204) {
-    clearCache();
-    return null;
-  }
+  if (response.status === 204) return null;
   const data = await response.json().catch(() => ({}));
   if (!response.ok) {
     const detail = data.detail;
     throw new Error(typeof detail === "string" ? detail : `Request failed (${response.status})`);
   }
-  if (cacheable) writeCache(key, data);
-  else if (method !== "GET") clearCache();
-  onFresh?.(data);
   return data;
-}
-
-export async function api(path, { token, staleWhileRevalidate = false, onFresh, ...options } = {}) {
-  const method = (options.method || "GET").toUpperCase();
-  const cacheable = method === "GET" && !token && options.cache !== "no-store";
-  const key = cacheKey(path);
-  if (cacheable) {
-    const cached = readCache(key, staleWhileRevalidate);
-    if (cached.hit && !cached.stale) return cached.data;
-    if (cached.hit && cached.stale) {
-      void requestApi(path, { token, ...options, onFresh }).catch(() => {});
-      return cached.data;
-    }
-  }
-  return requestApi(path, { token, ...options, onFresh });
 }

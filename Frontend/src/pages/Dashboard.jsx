@@ -7,27 +7,22 @@ import LiveCountrySkills from "../components/LiveCountrySkills.jsx";
 import { api } from "../api.js";
 
 function Dashboard() {
-  const [snapshot, setSnapshot] = useState({ status: null, skills: [], locations: [], countries: [] });
+  const [snapshot, setSnapshot] = useState({ status: null, skills: [], locations: [], countries: [], location_skills: {}, country_skills: {} });
   const [loading, setLoading] = useState(true);
   const [snapshotError, setSnapshotError] = useState("");
   const [selectedCountry, setSelectedCountry] = useState("");
 
   useEffect(() => {
     let active = true;
-    const applySnapshot = (data) => {
-      if (!active) return;
-      setSnapshot(data);
-      setSelectedCountry((current) => current || data.countries[0]?.country || "");
-      setSnapshotError("");
-      setLoading(false);
-    };
     const loadSnapshot = async () => {
       try {
-        const data = await api("/api/dashboard-snapshot", {
-          staleWhileRevalidate: true,
-          onFresh: applySnapshot,
-        });
-        applySnapshot(data);
+        const data = await api("/api/dashboard-snapshot");
+        if (active) {
+          setSnapshot(data);
+          setSelectedCountry((current) => current || data.countries[0]?.country || "");
+          setSnapshotError("");
+          setLoading(false);
+        }
       } catch (error) {
         console.error(error);
         if (active) {

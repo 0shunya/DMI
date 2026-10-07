@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 from scraper import scrape_multiple_countries
 from .cache import invalidate_analytics
 from .models import Job
+from .snapshot import publish_dashboard_snapshot
 
 logger = logging.getLogger(__name__)
 
@@ -50,6 +51,7 @@ def ingest_frame(db: Session, frame: pd.DataFrame) -> int:
     db.commit()
     if count:
         invalidate_analytics()
+        publish_dashboard_snapshot(db)
     return count
 
 

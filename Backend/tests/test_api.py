@@ -12,7 +12,7 @@ from sqlalchemy.pool import StaticPool
 from app import app, make_oauth_state, valid_oauth_state
 from dmi.database import Base, get_db
 from dmi.ingestion import ingest_frame
-from dmi.models import Job, OAuthTicket, User
+from dmi.models import DashboardSnapshot, Job, OAuthTicket, User
 from skill_extractor import extract_skills
 
 
@@ -168,6 +168,10 @@ def test_analytics_and_query(context):
     assert snapshot.json()["status"]["total"] == 2
     assert snapshot.json()["countries"][0]["regions"] == ["Pune"]
     assert snapshot.json()["country_skills"]["India"]["Python"] == 1
+    with session() as db:
+        rows = db.scalars(select(DashboardSnapshot)).all()
+        assert len(rows) == 1
+        assert rows[0].is_active is True
     assert client.get("/api/data-status").json()["demo_count"] == 2
 
 

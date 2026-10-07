@@ -136,7 +136,7 @@ The default bind address is `127.0.0.1`, so the service is not accidentally expo
 | `GET /health` | Database-aware health check |
 | `GET /api/jobs?q=&country=&limit=` | Search stored jobs |
 | `GET /api/data-status` | Snapshot freshness and demo count |
-| `GET /api/dashboard-snapshot` | One cached dashboard payload from the persisted PostgreSQL snapshot |
+| `GET /api/dashboard-snapshot` | The active precomputed dashboard payload stored in PostgreSQL |
 | `POST /api/auth/register` | Create an account |
 | `POST /api/auth/login` | Start a JWT session |
 | `PATCH /api/me` | Store candidate skills |
@@ -211,7 +211,7 @@ DMI requests only `read:user user:email`, selects a verified GitHub email, and d
 
 OAuth callback tickets are short-lived, single-use, and exchanged for the same DMI JWT session used by password accounts.
 
-The dashboard uses `/api/dashboard-snapshot` so its analytics load in one request. The browser keeps the last successful snapshot in session storage; after the five-minute freshness window it renders that snapshot immediately and refreshes it in the background. This keeps a Render wake-up or temporary API delay from blanking the dashboard when stored data is already available.
+The dashboard uses `/api/dashboard-snapshot` so its analytics load in one request from the active PostgreSQL snapshot row. Ingestion builds a new version and switches it active only after the complete payload is ready, so every user reads the same last-completed snapshot. The browser does not persist this dashboard data.
 
 ## Scheduled production ingestion
 

@@ -68,6 +68,15 @@ class OAuthTicket(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 
 
+class DashboardSnapshot(Base):
+    __tablename__ = "dashboard_snapshots"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    version: Mapped[int] = mapped_column(Integer, unique=True, index=True)
+    payload: Mapped[dict] = mapped_column(JSON)
+    is_active: Mapped[bool] = mapped_column(default=False, index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+
 class Application(Base):
     __tablename__ = "applications"
     __table_args__ = (
