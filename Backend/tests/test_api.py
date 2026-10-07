@@ -163,6 +163,11 @@ def test_analytics_and_query(context):
     assert client.get("/api/locations").json() == [{"location": "Pune, India", "country": "India", "jobs": 2}]
     assert client.get("/api/countries").json() == [{"country": "India", "jobs": 2, "regions": ["Pune"]}]
     assert client.get("/api/country-skills").json()["India"]["C++"] == 1
+    snapshot = client.get("/api/dashboard-snapshot")
+    assert snapshot.status_code == 200
+    assert snapshot.json()["status"]["total"] == 2
+    assert snapshot.json()["countries"][0]["regions"] == ["Pune"]
+    assert snapshot.json()["country_skills"]["India"]["Python"] == 1
     assert client.get("/api/data-status").json()["demo_count"] == 2
 
 

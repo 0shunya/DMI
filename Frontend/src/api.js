@@ -1,6 +1,6 @@
 import { API_URL } from "./config.js";
 
-const CACHE_VERSION = "v3";
+const CACHE_VERSION = "v4";
 const CACHE_TTL_MS = 5 * 60 * 1000;
 const CACHE_PREFIX = `dmi-api-${CACHE_VERSION}:`;
 const memoryCache = new Map();
@@ -9,19 +9,21 @@ function cacheKey(path) {
   return `${CACHE_PREFIX}${API_URL}${path}`;
 }
 
-function readCache(key) {
+function readCache(key, allowStale = false) {
   const now = Date.now();
   const memoryEntry = memoryCache.get(key);
-  if (memoryEntry?.expiresAt > now) return { hit: true, data: memoryEntry.data };
+  if (memoryEntry && (memoryEntry.expiresAt > now || allowStale)) {
+    return { hit: true, stale: memoryEntry.expiresAt <= now, data: memoryEntry.data };
+  }
   memoryCache.delete(key);
 
   try {
     const stored = sessionStorage.getItem(key);
     if (!stored) return { hit: false };
     const entry = JSON.parse(stored);
-    if (entry.expiresAt > now) {
+    if (entry.expiresAt > now || allowStale) {
       memoryCache.set(key, entry);
-      return { hit: true, data: entry.data };
+      return { hit: true, stale: entry.expiresAt <= now, data: entry.data };
     }
     sessionStorage.removeItem(key);
   } catch {
@@ -49,15 +51,10 @@ function clearCache() {
   }
 }
 
-export async function api(path, { token, ...options } = {}) {
+async function requestApi(path, { token, onFresh, ...options } = {}) {
   const method = (options.method || "GET").toUpperCase();
   const cacheable = method === "GET" && !token && options.cache !== "no-store";
   const key = cacheKey(path);
-  if (cacheable) {
-    const cached = readCache(key);
-    if (cached.hit) return cached.data;
-  }
-
   const response = await fetch(`${API_URL}${path}`, {
     ...options,
     headers: {
@@ -77,5 +74,21 @@ export async function api(path, { token, ...options } = {}) {
   }
   if (cacheable) writeCache(key, data);
   else if (method !== "GET") clearCache();
+  onFresh?.(data);
   return data;
+}
+
+export async function api(path, { token, staleWhileRevalidate = false, onFresh, ...options } = {}) {
+  const method = (options.method || "GET").toUpperCase();
+  const cacheable = method === "GET" && !token && options.cache !== "no-store";
+  const key = cacheKey(path);
+  if (cacheable) {
+    const cached = readCache(key, staleWhileRevalidate);
+    if (cached.hit && !cached.stale) return cached.data;
+    if (cached.hit && cached.stale) {
+      void requestApi(path, { token, ...options, onFresh }).catch(() => {});
+      return cached.data;
+    }
+  }
+  return requestApi(path, { token, ...options, onFresh });
 }

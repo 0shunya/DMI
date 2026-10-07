@@ -205,6 +205,44 @@ def all_jobs(db: Session) -> list[Job]:
     return list(db.scalars(select(Job)).all())
 
 
+@app.get("/api/dashboard-snapshot")
+def get_dashboard_snapshot(db: Session = Depends(get_db)):
+    def produce():
+        jobs = all_jobs(db)
+        latest = max((job.scraped_at for job in jobs), default=None)
+        demo_count = sum(1 for job in jobs if job.source == "demo")
+        skill_counts = Counter(skill for job in jobs for skill in extract_skills(f"{job.title} {job.description}"))
+        location_counts = Counter((display_location(job.location, job.country), display_country(job.country)) for job in jobs if job.location != "Not specified")
+        grouped: dict[str, dict[str, object]] = {}
+        location_skills: dict[str, Counter] = {}
+        country_skills: dict[str, Counter] = {}
+        for job in jobs:
+            country = job.country or "Not specified"
+            record = grouped.setdefault(country, {"jobs": 0, "regions": set()})
+            record["jobs"] = int(record["jobs"]) + 1
+            if job.location != "Not specified":
+                record["regions"].add(display_region(job.location, job.country))
+                location_skills.setdefault(display_location(job.location, job.country), Counter()).update(extract_skills(f"{job.title} {job.description}"))
+            country_skills.setdefault(display_country(country), Counter()).update(extract_skills(f"{job.title} {job.description}"))
+        countries = [
+            {"country": display_country(country), "jobs": int(record["jobs"]), "regions": sorted(record["regions"])}
+            for country, record in sorted(grouped.items(), key=lambda item: (-int(item[1]["jobs"]), item[0]))
+        ]
+        return {
+            "status": {
+                "total": len(jobs), "demo_count": demo_count,
+                "updated_at": latest.isoformat() if latest else None,
+                "note": "Job-board results may be incomplete or delayed; demo records are illustrative.",
+            },
+            "skills": [{"skill": name, "jobs": amount} for name, amount in skill_counts.most_common()],
+            "locations": [{"location": name, "country": country, "jobs": amount} for (name, country), amount in location_counts.most_common()],
+            "countries": countries,
+            "location_skills": {location: dict(counts) for location, counts in location_skills.items()},
+            "country_skills": {country: dict(counts) for country, counts in country_skills.items()},
+        }
+    return cached("analytics:dashboard-snapshot:v1", produce)
+
+
 @app.get("/api/skills")
 def get_skills(db: Session = Depends(get_db)):
     def produce():

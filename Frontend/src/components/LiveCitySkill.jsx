@@ -1,41 +1,12 @@
-import { useEffect, useState } from "react";
-import { api } from "../api.js";
-
 import CitySkillChart from "./CitySkillChart";
 
-function LiveCitySkill({ selectedCountry }) {
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-
-  useEffect(() => {
-    const fetchLocationSkills = async () => {
-      try {
-        const [result, locationRows] = await Promise.all([
-          api("/api/location-skills"),
-          api("/api/locations"),
-        ]);
-        const countryByLocation = new Map(locationRows.map((item) => [item.location, item.country]));
-
-        const formattedData = Object.entries(result).map(
-          ([location, skills]) => ({
-            location,
-            country: countryByLocation.get(location) || "Not specified",
-            ...skills,
-          })
-        );
-
-        setData(formattedData);
-      } catch (error) {
-        console.error(error);
-        setError("Unable to load live skill data.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchLocationSkills();
-  }, []);
+function LiveCitySkill({ locationSkills = {}, locations = [], selectedCountry, loading, error = "" }) {
+  const countryByLocation = new Map(locations.map((item) => [item.location, item.country]));
+  const data = Object.entries(locationSkills).map(([location, skills]) => ({
+    location,
+    country: countryByLocation.get(location) || "Not specified",
+    ...skills,
+  }));
 
   if (loading) {
     return (

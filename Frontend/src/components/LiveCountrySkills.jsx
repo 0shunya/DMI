@@ -1,36 +1,7 @@
-import { useEffect, useState } from "react";
-import { api } from "../api.js";
-
 import CountrySkillChart from "./CountrySkillChart";
 
-function LiveCountrySkills({ selectedCountry, onCountryChange }) {
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-
-  useEffect(() => {
-    const fetchCountrySkills = async () => {
-      try {
-        const result = await api("/api/country-skills");
-
-        const formattedData = Object.entries(result).map(
-          ([country, skills]) => ({
-            country,
-            ...skills,
-          })
-        );
-
-        setData(formattedData);
-      } catch (error) {
-        console.error(error);
-        setError("Unable to load live country skill data.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchCountrySkills();
-  }, []);
+function LiveCountrySkills({ data: result = {}, selectedCountry, onCountryChange, loading, error = "" }) {
+  const data = Object.entries(result).map(([country, skills]) => ({ country, ...skills }));
 
   if (loading) {
     return (

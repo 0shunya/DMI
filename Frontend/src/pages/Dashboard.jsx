@@ -9,24 +9,31 @@ import { api } from "../api.js";
 function Dashboard() {
   const [snapshot, setSnapshot] = useState({ status: null, skills: [], locations: [], countries: [] });
   const [loading, setLoading] = useState(true);
+  const [snapshotError, setSnapshotError] = useState("");
   const [selectedCountry, setSelectedCountry] = useState("");
 
   useEffect(() => {
     let active = true;
+    const applySnapshot = (data) => {
+      if (!active) return;
+      setSnapshot(data);
+      setSelectedCountry((current) => current || data.countries[0]?.country || "");
+      setSnapshotError("");
+      setLoading(false);
+    };
     const loadSnapshot = async () => {
       try {
-        const [status, skills, locations, countries] = await Promise.all([
-          api("/api/data-status"),
-          api("/api/skills"),
-          api("/api/locations"),
-          api("/api/countries"),
-        ]);
+        const data = await api("/api/dashboard-snapshot", {
+          staleWhileRevalidate: true,
+          onFresh: applySnapshot,
+        });
+        applySnapshot(data);
+      } catch (error) {
+        console.error(error);
         if (active) {
-          setSnapshot({ status, skills, locations, countries });
-          setSelectedCountry((current) => current || countries[0]?.country || "");
+          setSnapshotError("Unable to load the stored job snapshot.");
+          setLoading(false);
         }
-      } finally {
-        if (active) setLoading(false);
       }
     };
     loadSnapshot();
@@ -54,7 +61,7 @@ function Dashboard() {
       </section>
 
       <section className="signal-feature" id="signal">
-        <div className="feature-label"><span className="signal-dot" /> STORED SNAPSHOT · {loading ? "CHECKING DATA" : "UPDATED"}</div>
+        <div className="feature-label"><span className="signal-dot" /> STORED SNAPSHOT · {loading ? "CHECKING DATA" : snapshotError ? "UNAVAILABLE" : "UPDATED"}</div>
         <div className="signal-grid">
           <div className="signal-statement"><h2>{topSkill ? `${topSkill.skill} is the strongest signal in this snapshot.` : "The snapshot is waiting for its first import."}</h2><p>{topSkill ? `${topSkill.jobs} stored listings mention this skill. This is a descriptive count, not a hiring prediction.` : "Start the worker or load the clearly labeled demo dataset to explore the workflow."}</p></div>
           <div className="signal-number"><strong>{status?.total ?? "—"}</strong><span>STORED<br />JOB RECORDS</span></div>
@@ -69,12 +76,12 @@ function Dashboard() {
 
       <section className="section-block">
         <div className="section-heading"><div><span className="section-number">03</span><h2>Stored signals</h2></div><p>Skill mentions and regional volume from the same persisted listings.</p></div>
-        <div className="editorial-grid charts-grid"><LiveSkillDemand /><LiveCityJobs /></div>
+        <div className="editorial-grid charts-grid"><LiveSkillDemand data={snapshot.skills} loading={loading} error={snapshotError} /><LiveCityJobs data={snapshot.countries} loading={loading} error={snapshotError} /></div>
       </section>
 
       <section className="section-block">
         <div className="section-heading"><div><span className="section-number">04</span><h2>Skill mix by place</h2></div><p>Dynamic regional and country skill views from the stored job records.</p></div>
-        <div className="editorial-grid charts-grid location-charts"><LiveCitySkill selectedCountry={selectedCountry} /><LiveCountrySkills selectedCountry={selectedCountry} onCountryChange={setSelectedCountry} /></div>
+        <div className="editorial-grid charts-grid location-charts"><LiveCitySkill locations={snapshot.locations} locationSkills={snapshot.location_skills} selectedCountry={selectedCountry} loading={loading} error={snapshotError} /><LiveCountrySkills data={snapshot.country_skills} selectedCountry={selectedCountry} onCountryChange={setSelectedCountry} loading={loading} error={snapshotError} /></div>
       </section>
 
       <section className="method-note"><span className="eyebrow">A NOTE ON THE NUMBERS</span><p>Last snapshot: {updatedAt}. DMI reports listing counts, not truth about the entire labor market. <a href="/jobs">Inspect the listings and their sources.</a></p></section>

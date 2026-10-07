@@ -1,36 +1,11 @@
-import { useEffect, useState } from "react";
-import { api } from "../api.js";
-
-
 import CityJobsChart from "./CityJobsChart";
 
-function LiveCityJobs() {
-  const [locations, setLocations] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-
-  useEffect(() => {
-    const fetchLocations = async () => {
-      try {
-        const data = await api("/api/countries");
-
-        const formattedData = data.slice(0, 8).map((item) => ({
-          country: item.country,
-          jobs: item.jobs,
-          regions: item.regions,
-        }));
-
-        setLocations(formattedData);
-      } catch (error) {
-        console.error(error);
-        setError("Unable to load country snapshot data.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchLocations();
-  }, []);
+function LiveCityJobs({ data = [], loading, error = "" }) {
+  const locations = data.slice(0, 8).map((item) => ({
+    country: item.country,
+    jobs: item.jobs,
+    regions: item.regions,
+  }));
 
   if (loading) {
     return (
