@@ -2,3 +2,7 @@ fastapi
 uvicorn[standard]
 python-jobspy
 pandas
+sqlalchemy>=2.0,<3.0
+alembic>=1.13,<2.0
+psycopg[binary]>=3.1,<4.0
+redis>=5.0,<6.0
