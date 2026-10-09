@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { API_URL } from "../config.js";
+import { JobsLoading } from "./ShimmerLoading";
 
 
 function LiveJobs() {
@@ -51,7 +52,7 @@ useEffect(() => {
         </button>
       </div>
 
-      {loading && <p>Loading live jobs...</p>}
+      {loading && <JobsLoading />}
 
       {error && <p>{error}</p>}
 
