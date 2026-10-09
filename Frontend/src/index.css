@@ -5,3 +5,30 @@
 .signal-number .count-up-text {
   font-weight: inherit;
 }
+
+/* Shared loading shimmer */
+.shimmer-block { display:block; position:relative; overflow:hidden; background:#e3dfd6; border-radius:3px; }
+.shimmer-block::after { content:""; position:absolute; inset:0; transform:translateX(-100%); background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,.72) 48%,transparent 100%); animation:dmi-shimmer 1.35s ease-in-out infinite; }
+@keyframes dmi-shimmer { 100% { transform:translateX(100%); } }
+.loading-card { min-height:310px; }
+.shimmer-chart { display:flex; flex-direction:column; gap:14px; margin-top:28px; }
+.shimmer-chart-line { height:10px; }
+.shimmer-chart-line-wide { width:88%; }
+.shimmer-chart-line-mid { width:67%; }
+.shimmer-chart-line-short { width:43%; }
+.shimmer-chart-bars { display:flex; align-items:flex-end; gap:12px; height:120px; margin-top:8px; border-bottom:1px solid var(--rule); }
+.shimmer-bar { width:14%; min-height:28px; }
+.shimmer-bar-one { height:52%; }
+.shimmer-bar-two { height:78%; }
+.shimmer-bar-three { height:62%; }
+.shimmer-bar-four { height:92%; }
+.shimmer-bar-five { height:44%; }
+.loading-caption { color:var(--muted); font-family:"IBM Plex Mono",monospace; font-size:10px; letter-spacing:.06em; text-transform:uppercase; margin-top:20px; }
+.jobs-loading { display:grid; gap:0; }
+.job-row-skeleton { pointer-events:none; }
+.job-skeleton-copy { display:grid; gap:10px; }
+.job-skeleton-title { width:min(360px,72vw); height:17px; }
+.job-skeleton-company { width:150px; height:11px; }
+.job-skeleton-location { width:110px; height:12px; }
+.job-skeleton-link { width:70px; height:12px; }
+@media (prefers-reduced-motion:reduce) { .shimmer-block::after { animation:none; } }

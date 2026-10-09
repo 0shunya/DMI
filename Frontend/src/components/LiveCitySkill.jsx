@@ -1,4 +1,5 @@
 import CitySkillChart from "./CitySkillChart";
+import { ChartLoading } from "./ShimmerLoading";
 
 function LiveCitySkill({ locationSkills = {}, locations = [], selectedCountry, loading, error = "" }) {
   const countryByLocation = new Map(locations.map((item) => [item.location, item.country]));
@@ -8,14 +9,7 @@ function LiveCitySkill({ locationSkills = {}, locations = [], selectedCountry, l
     ...skills,
   }));
 
-  if (loading) {
-    return (
-      <section className="chart-card">
-        <h2>Skills by Region</h2>
-        <p>Loading stored job snapshot...</p>
-      </section>
-    );
-  }
+  if (loading) return <ChartLoading title="Skills by Region" />;
 
   if (error) {
     return (

@@ -3,6 +3,7 @@ import Navbar from "../components/Navbar.jsx";
 import AuthPanel from "../components/workspace/AuthPanel.jsx";
 import { api } from "../api.js";
 import { useAuth } from "../context/auth.js";
+import { JobsLoading } from "../components/ShimmerLoading.jsx";
 import "../styles/workspace.css";
 
 const countries = ["", "India", "USA", "Canada", "UK", "Australia"];
@@ -162,7 +163,9 @@ export default function Jobs() {
           <div className="results-meta"><span>{loading ? "Loading…" : `${jobs.length} result${jobs.length === 1 ? "" : "s"}`}</span><button className="quiet-button" type="button" onClick={() => load({ fresh: true })} disabled={loading}>Refresh snapshot ↻</button></div>
           {error && <p role="alert" className="form-error">{error}</p>}
           {!loading && !error && jobs.length === 0 && <div className="workspace-empty"><h3>No listings in this view.</h3><p>Try a broader search. If the database is new, wait for the worker or use the clearly labeled demo dataset in the README.</p></div>}
-          <div className="job-list">{jobs.map((job) => <JobCard key={job.id} job={job} token={token} saved={savedIds.includes(job.id)} onSaved={refreshSaved} hasSkills={Boolean(user?.skills?.length)} />)}</div>
+          <div className="job-list">
+            {loading ? <JobsLoading /> : jobs.map((job) => <JobCard key={job.id} job={job} token={token} saved={savedIds.includes(job.id)} onSaved={refreshSaved} hasSkills={Boolean(user?.skills?.length)} />)}
+          </div>
         </section>
         <aside className="workspace-side" aria-label="Your search profile">
           {token ? <div className="workspace-panel">
